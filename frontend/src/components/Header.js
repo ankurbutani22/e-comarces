@@ -1,0 +1,186 @@
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { getDeliveryOrders, getMyOrders, getSellerOrders } from '../services/authService';
+
+const PROFILE_PLACEHOLDER =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="32" fill="%23dbeafe"/><circle cx="32" cy="25" r="12" fill="%236b7280"/><path d="M14 52c3-9 9-14 18-14s15 5 18 14" fill="%236b7280"/></svg>';
+
+function Header({ user, token, onLogout }) {
+  const navigate = useNavigate();
+  const canUseCart = user && (user.role === 'user' || user.role === 'admin');
+  const canSeeOrders = user && user.role === 'user';
+  const canUseScanner = user && (user.role === 'seller' || user.role === 'admin' || user.role === 'delivery_boy');
+  const canUseDeliveryPanel = user && user.role === 'delivery_boy';
+  const profileImageSrc = user?.profileImage || user?.avatar || user?.image || PROFILE_PLACEHOLDER;
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const notificationRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutside = (event) => {
+      if (!notificationRef.current) return;
+      if (!notificationRef.current.contains(event.target)) {
+        setNotificationsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, []);
+
+  useEffect(() => {
+    const loadNotifications = async () => {
+      if (!user || !token) {
+        setNotifications([]);
+        return;
+      }
+
+      try {
+        setNotificationsLoading(true);
+        let response;
+
+        if (user.role === 'user') {
+          response = await getMyOrders(token);
+        } else if (user.role === 'delivery_boy') {
+          response = await getDeliveryOrders(token);
+        } else {
+          response = await getSellerOrders(token);
+        }
+
+        const recent = (response?.data || []).slice(0, 5).map((order) => ({
+          id: order._id,
+          title: `Order #${String(order._id).slice(-6)} is ${order.status}`,
+          subTitle: user.role === 'user'
+            ? `Total: Rs. ${order.totalAmount || 0}`
+            : `Your total: Rs. ${order.sellerTotal || 0}`,
+          status: order.status,
+          createdAt: order.createdAt
+        }));
+
+        setNotifications(recent);
+      } catch (error) {
+        setNotifications([]);
+      } finally {
+        setNotificationsLoading(false);
+      }
+    };
+
+    loadNotifications();
+  }, [user, token]);
+
+  const unreadCount = useMemo(
+    () => notifications.filter((n) => n.status === 'pending' || n.status === 'processing').length,
+    [notifications]
+  );
+
+  const handleOpenNotifications = () => {
+    setNotificationsOpen((prev) => !prev);
+  };
+
+  return (
+    <header className="app-header">
+      <div className="header-inner">
+        <Link to="/" className="brand-link">
+          <span className="brand-mark">EC</span>
+          <span className="brand-text">E-Commerce Store</span>
+        </Link>
+
+        <nav className="header-nav">
+          <Link to="/">Home</Link>
+          {canUseCart ? <Link to="/cart">Cart</Link> : null}
+          {canSeeOrders ? <Link to="/orders">My Orders</Link> : null}
+          {canUseScanner ? <Link to="/seller/scan">QR Scanner</Link> : null}
+          {canUseDeliveryPanel ? <Link to="/delivery">Delivery Panel</Link> : null}
+          {user?.role === 'admin' ? <Link to="/admin">Admin Panel</Link> : null}
+          {user?.role === 'seller' ? <Link to="/seller">Seller Panel</Link> : null}
+        </nav>
+
+        <div className="header-actions">
+          {user ? (
+            <div className="notification-wrap" ref={notificationRef}>
+              <button
+                type="button"
+                className="nav-icon-btn"
+                aria-label="Notifications"
+                title="Notifications"
+                onClick={handleOpenNotifications}
+              >
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3a5 5 0 00-5 5v2.9c0 .6-.2 1.2-.57 1.67L5 14.5h14l-1.43-1.93a2.8 2.8 0 01-.57-1.67V8a5 5 0 00-5-5z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M9.5 17a2.5 2.5 0 005 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              </svg>
+              {unreadCount > 0 ? <span className="icon-dot" /> : null}
+              </button>
+
+              {notificationsOpen ? (
+                <div className="notification-panel">
+                  <div className="notification-head">
+                    <strong>Notifications</strong>
+                    {unreadCount > 0 ? <span>{unreadCount} new</span> : null}
+                  </div>
+
+                  {notificationsLoading ? <p className="notification-empty">Loading...</p> : null}
+
+                  {!notificationsLoading && notifications.length === 0 ? (
+                    <p className="notification-empty">No notifications yet.</p>
+                  ) : null}
+
+                  {!notificationsLoading && notifications.length > 0 ? (
+                    <div className="notification-list">
+                      {notifications.map((item) => (
+                        <button
+                          type="button"
+                          key={item.id}
+                          className="notification-item"
+                          onClick={() => {
+                            setNotificationsOpen(false);
+                            if (user?.role === 'user') {
+                              navigate('/orders');
+                            } else if (user?.role === 'delivery_boy') {
+                              navigate('/delivery');
+                            } else {
+                              navigate('/seller');
+                            }
+                          }}
+                        >
+                          <p>{item.title}</p>
+                          <span>{item.subTitle}</span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {user ? (
+            <Link to="/profile" className="nav-avatar-btn" aria-label="My Profile" title="My Profile">
+              <img
+                src={profileImageSrc}
+                alt={user?.name || 'Profile'}
+                className="nav-avatar-img"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = PROFILE_PLACEHOLDER;
+                }}
+              />
+            </Link>
+          ) : null}
+
+          {!user ? <Link to="/login" className="auth-link">Login</Link> : null}
+          {!user ? <Link to="/register" className="auth-link primary">Register</Link> : null}
+
+          {user ? (
+            <button type="button" onClick={onLogout} className="link-button logout-btn">
+              Logout
+            </button>
+          ) : null}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export default Header;
