@@ -1,7 +1,7 @@
 import React from 'react';
 import ProductCard from '../components/ProductCard';
 
-function ProductList({ products, loading, error, onRefresh }) {
+function ProductList({ products, loading, error, onRefresh, searchQuery = '' }) {
   const list = Array.isArray(products) ? products : [];
 
   if (loading) {
@@ -18,7 +18,11 @@ function ProductList({ products, loading, error, onRefresh }) {
   }
 
   if (list.length === 0) {
-    return <div className="loading">No products available</div>;
+    return (
+      <div className="loading">
+        {searchQuery.trim() ? 'No products match your search' : 'No products available'}
+      </div>
+    );
   }
 
   return (

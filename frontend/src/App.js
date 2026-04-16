@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
@@ -24,8 +24,9 @@ function App() {
   const [error, setError] = useState(null);
   const [user, setUser] = useState(() => readLocalJson('user', null));
   const [token, setToken] = useState(() => localStorage.getItem('token') || '');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const visibleProducts = React.useMemo(() => {
+  const visibleProducts = useMemo(() => {
     if (!user || user.role !== 'seller') {
       return products;
     }
@@ -41,6 +42,23 @@ function App() {
       return String(productSellerId) === String(currentSellerId);
     });
   }, [products, user]);
+
+  const filteredProducts = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    if (!query) {
+      return visibleProducts;
+    }
+
+    return visibleProducts.filter((product) => {
+      const haystack = [product?.name, product?.category, product?.description]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      return haystack.includes(query);
+    });
+  }, [visibleProducts, searchQuery]);
 
   useEffect(() => {
     fetchProducts();
@@ -90,17 +108,24 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <Header user={user} token={token} onLogout={handleLogout} />
+        <Header
+          user={user}
+          token={token}
+          onLogout={handleLogout}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
         <main className="main-content">
           <Routes>
             <Route 
               path="/" 
               element={
                 <ProductList 
-                  products={visibleProducts} 
+                  products={filteredProducts} 
                   loading={loading} 
                   error={error} 
                   onRefresh={fetchProducts}
+                  searchQuery={searchQuery}
                 />
               } 
             />

@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { getDeliveryOrders, getMyOrders, getSellerOrders } from '../services/authService';
 
 const PROFILE_PLACEHOLDER =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="32" fill="%23dbeafe"/><circle cx="32" cy="25" r="12" fill="%236b7280"/><path d="M14 52c3-9 9-14 18-14s15 5 18 14" fill="%236b7280"/></svg>';
 
-function Header({ user, token, onLogout }) {
+function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const canUseCart = user && (user.role === 'user' || user.role === 'admin');
   const canSeeOrders = user && user.role === 'user';
   const canUseScanner = user && (user.role === 'seller' || user.role === 'admin' || user.role === 'delivery_boy');
@@ -78,6 +80,8 @@ function Header({ user, token, onLogout }) {
     setNotificationsOpen((prev) => !prev);
   };
 
+  const showSearch = location.pathname === '/';
+
   return (
     <header className="app-header">
       <div className="header-inner">
@@ -95,6 +99,40 @@ function Header({ user, token, onLogout }) {
           {user?.role === 'admin' ? <Link to="/admin">Admin Panel</Link> : null}
           {user?.role === 'seller' ? <Link to="/seller">Seller Panel</Link> : null}
         </nav>
+
+        {showSearch ? (
+          <div className="header-search-wrap">
+            <label className="header-search-label" htmlFor="home-search">
+              Search products
+            </label>
+            <div className="header-search-box">
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="header-search-icon">
+                <path
+                  d="M10.5 4a6.5 6.5 0 104.11 11.53l4.43 4.43a1 1 0 001.41-1.42l-4.42-4.43A6.5 6.5 0 0010.5 4z"
+                  fill="currentColor"
+                />
+              </svg>
+              <input
+                id="home-search"
+                type="search"
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder="Search by name, category, or description"
+                className="header-search-input"
+              />
+              {searchQuery ? (
+                <button
+                  type="button"
+                  className="header-search-clear"
+                  onClick={() => onSearchChange('')}
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
 
         <div className="header-actions">
           {user ? (
