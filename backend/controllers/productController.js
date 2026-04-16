@@ -201,3 +201,79 @@ exports.deleteProduct = async (req, res) => {
     });
   }
 };
+
+// Migrate broken image URLs to placeholder (admin only)
+exports.migrateImages = async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can perform this migration'
+      });
+    }
+
+    const placeholder = 'https://via.placeholder.com/400';
+    const products = await Product.find();
+    let updated = 0;
+
+    for (const product of products) {
+      let modified = false;
+
+      // Filter out /uploads/ URLs from images array
+      if (Array.isArray(product.images)) {
+        const filteredImages = product.images.filter(
+          (img) => img && typeof img === 'string' && !img.includes('/uploads/')
+        );
+        if (filteredImages.length !== product.images.length) {
+          product.images = filteredImages;
+          modified = true;
+        }
+      }
+
+      // Fix main image if it's a local file URL
+      if (product.image && typeof product.image === 'string' && product.image.includes('/uploads/')) {
+        product.image = placeholder;
+        modified = true;
+      }
+
+      // If no valid image after cleanup, use placeholder
+      if (!product.image || product.image === '') {
+        product.image = placeholder;
+        modified = true;
+      }
+
+      // Clean up variant images
+      if (Array.isArray(product.variants)) {
+        for (const variant of product.variants) {
+          if (Array.isArray(variant.images)) {
+            const filteredVariantImages = variant.images.filter(
+              (img) => img && typeof img === 'string' && !img.includes('/uploads/')
+            );
+            if (filteredVariantImages.length !== variant.images.length) {
+              variant.images = filteredVariantImages;
+              modified = true;
+            }
+          }
+        }
+      }
+
+      if (modified) {
+        await product.save();
+        updated++;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Migration completed. Updated ${updated} products.`,
+      updatedCount: updated,
+      totalProducts: products.length
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};

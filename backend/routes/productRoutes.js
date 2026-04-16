@@ -6,9 +6,13 @@ const {
   getProductById,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  migrateImages
 } = require('../controllers/productController');
 const { protect, authorize } = require('../middleware/authMiddleware');
+
+// Admin migration endpoint (must come before GET routes)
+router.post('/admin/migrate-images', protect, authorize('admin'), migrateImages);
 
 router.get('/my-products', protect, authorize('seller', 'admin'), getMyProducts);
 
