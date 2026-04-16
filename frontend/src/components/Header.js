@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getDeliveryOrders, getMyOrders, getSellerOrders } from '../services/authService';
 
 const PROFILE_PLACEHOLDER =
@@ -85,135 +84,139 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
   return (
     <header className="app-header">
       <div className="header-inner">
-        <Link to="/" className="brand-link">
-          <span className="brand-mark">EC</span>
-          <span className="brand-text">E-Commerce Store</span>
-        </Link>
+        <div className="header-top-row">
+          <Link to="/" className="brand-link">
+            <span className="brand-mark">EC</span>
+            <span className="brand-text">E-Commerce Store</span>
+          </Link>
 
-        <nav className="header-nav">
-          <Link to="/">Home</Link>
-          {canUseCart ? <Link to="/cart">Cart</Link> : null}
-          {canSeeOrders ? <Link to="/orders">My Orders</Link> : null}
-          {canUseScanner ? <Link to="/seller/scan">QR Scanner</Link> : null}
-          {canUseDeliveryPanel ? <Link to="/delivery">Delivery Panel</Link> : null}
-          {user?.role === 'admin' ? <Link to="/admin">Admin Panel</Link> : null}
-          {user?.role === 'seller' ? <Link to="/seller">Seller Panel</Link> : null}
-        </nav>
-
-        {showSearch ? (
-          <div className="header-search-wrap">
-            <label className="header-search-label" htmlFor="home-search">
-              Search products
-            </label>
-            <div className="header-search-box">
-              <svg viewBox="0 0 24 24" aria-hidden="true" className="header-search-icon">
-                <path
-                  d="M10.5 4a6.5 6.5 0 104.11 11.53l4.43 4.43a1 1 0 001.41-1.42l-4.42-4.43A6.5 6.5 0 0010.5 4z"
-                  fill="currentColor"
-                />
-              </svg>
-              <input
-                id="home-search"
-                type="search"
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Search by name, category, or description"
-                className="header-search-input"
-              />
-              {searchQuery ? (
+          <div className="header-actions">
+            {user ? (
+              <div className="notification-wrap" ref={notificationRef}>
                 <button
                   type="button"
-                  className="header-search-clear"
-                  onClick={() => onSearchChange('')}
-                  aria-label="Clear search"
+                  className="nav-icon-btn"
+                  aria-label="Notifications"
+                  title="Notifications"
+                  onClick={handleOpenNotifications}
                 >
-                  ×
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 3a5 5 0 00-5 5v2.9c0 .6-.2 1.2-.57 1.67L5 14.5h14l-1.43-1.93a2.8 2.8 0 01-.57-1.67V8a5 5 0 00-5-5z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M9.5 17a2.5 2.5 0 005 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                </svg>
+                {unreadCount > 0 ? <span className="icon-dot" /> : null}
                 </button>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
 
-        <div className="header-actions">
-          {user ? (
-            <div className="notification-wrap" ref={notificationRef}>
-              <button
-                type="button"
-                className="nav-icon-btn"
-                aria-label="Notifications"
-                title="Notifications"
-                onClick={handleOpenNotifications}
-              >
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 3a5 5 0 00-5 5v2.9c0 .6-.2 1.2-.57 1.67L5 14.5h14l-1.43-1.93a2.8 2.8 0 01-.57-1.67V8a5 5 0 00-5-5z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M9.5 17a2.5 2.5 0 005 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-              {unreadCount > 0 ? <span className="icon-dot" /> : null}
-              </button>
-
-              {notificationsOpen ? (
-                <div className="notification-panel">
-                  <div className="notification-head">
-                    <strong>Notifications</strong>
-                    {unreadCount > 0 ? <span>{unreadCount} new</span> : null}
-                  </div>
-
-                  {notificationsLoading ? <p className="notification-empty">Loading...</p> : null}
-
-                  {!notificationsLoading && notifications.length === 0 ? (
-                    <p className="notification-empty">No notifications yet.</p>
-                  ) : null}
-
-                  {!notificationsLoading && notifications.length > 0 ? (
-                    <div className="notification-list">
-                      {notifications.map((item) => (
-                        <button
-                          type="button"
-                          key={item.id}
-                          className="notification-item"
-                          onClick={() => {
-                            setNotificationsOpen(false);
-                            if (user?.role === 'user') {
-                              navigate('/orders');
-                            } else if (user?.role === 'delivery_boy') {
-                              navigate('/delivery');
-                            } else {
-                              navigate('/seller');
-                            }
-                          }}
-                        >
-                          <p>{item.title}</p>
-                          <span>{item.subTitle}</span>
-                        </button>
-                      ))}
+                {notificationsOpen ? (
+                  <div className="notification-panel">
+                    <div className="notification-head">
+                      <strong>Notifications</strong>
+                      {unreadCount > 0 ? <span>{unreadCount} new</span> : null}
                     </div>
-                  ) : null}
-                </div>
-              ) : null}
+
+                    {notificationsLoading ? <p className="notification-empty">Loading...</p> : null}
+
+                    {!notificationsLoading && notifications.length === 0 ? (
+                      <p className="notification-empty">No notifications yet.</p>
+                    ) : null}
+
+                    {!notificationsLoading && notifications.length > 0 ? (
+                      <div className="notification-list">
+                        {notifications.map((item) => (
+                          <button
+                            type="button"
+                            key={item.id}
+                            className="notification-item"
+                            onClick={() => {
+                              setNotificationsOpen(false);
+                              if (user?.role === 'user') {
+                                navigate('/orders');
+                              } else if (user?.role === 'delivery_boy') {
+                                navigate('/delivery');
+                              } else {
+                                navigate('/seller');
+                              }
+                            }}
+                          >
+                            <p>{item.title}</p>
+                            <span>{item.subTitle}</span>
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            {user ? (
+              <Link to="/profile" className="nav-avatar-btn" aria-label="My Profile" title="My Profile">
+                <img
+                  src={profileImageSrc}
+                  alt={user?.name || 'Profile'}
+                  className="nav-avatar-img"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = PROFILE_PLACEHOLDER;
+                  }}
+                />
+              </Link>
+            ) : null}
+
+            {!user ? <Link to="/login" className="auth-link">Login</Link> : null}
+            {!user ? <Link to="/register" className="auth-link primary">Register</Link> : null}
+
+            {user ? (
+              <button type="button" onClick={onLogout} className="link-button logout-btn">
+                Logout
+              </button>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="header-bottom-row">
+          <nav className="header-nav">
+            <Link to="/">Home</Link>
+            {canUseCart ? <Link to="/cart">Cart</Link> : null}
+            {canSeeOrders ? <Link to="/orders">My Orders</Link> : null}
+            {canUseScanner ? <Link to="/seller/scan">QR Scanner</Link> : null}
+            {canUseDeliveryPanel ? <Link to="/delivery">Delivery Panel</Link> : null}
+            {user?.role === 'admin' ? <Link to="/admin">Admin Panel</Link> : null}
+            {user?.role === 'seller' ? <Link to="/seller">Seller Panel</Link> : null}
+          </nav>
+
+          {showSearch ? (
+            <div className="header-search-wrap">
+              <label className="header-search-label" htmlFor="home-search">
+                Search products
+              </label>
+              <div className="header-search-box">
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="header-search-icon">
+                  <path
+                    d="M10.5 4a6.5 6.5 0 104.11 11.53l4.43 4.43a1 1 0 001.41-1.42l-4.42-4.43A6.5 6.5 0 0010.5 4z"
+                    fill="currentColor"
+                  />
+                </svg>
+                <input
+                  id="home-search"
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  placeholder="Search products"
+                  className="header-search-input"
+                />
+                {searchQuery ? (
+                  <button
+                    type="button"
+                    className="header-search-clear"
+                    onClick={() => onSearchChange('')}
+                    aria-label="Clear search"
+                  >
+                    ×
+                  </button>
+                ) : null}
+              </div>
             </div>
-          ) : null}
-
-          {user ? (
-            <Link to="/profile" className="nav-avatar-btn" aria-label="My Profile" title="My Profile">
-              <img
-                src={profileImageSrc}
-                alt={user?.name || 'Profile'}
-                className="nav-avatar-img"
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = PROFILE_PLACEHOLDER;
-                }}
-              />
-            </Link>
-          ) : null}
-
-          {!user ? <Link to="/login" className="auth-link">Login</Link> : null}
-          {!user ? <Link to="/register" className="auth-link primary">Register</Link> : null}
-
-          {user ? (
-            <button type="button" onClick={onLogout} className="link-button logout-btn">
-              Logout
-            </button>
           ) : null}
         </div>
       </div>
