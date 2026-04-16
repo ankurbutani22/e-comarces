@@ -13,6 +13,9 @@ function ProductList({
 }) {
   const list = Array.isArray(products) ? products : [];
   const hasActiveFilters = searchQuery.trim() || sortBy !== 'featured';
+  const resultLabel = searchQuery.trim()
+    ? `${list.length} result${list.length === 1 ? '' : 's'} found`
+    : `${list.length} product${list.length === 1 ? '' : 's'} available`;
 
   if (loading) {
     return <div className="loading">Loading products...</div>;
@@ -40,27 +43,38 @@ function ProductList({
       <div className="storefront-head">
         <div className="storefront-kicker">Featured Collection</div>
         <h2>Discover products with a cleaner browsing flow</h2>
-        <p>Search from the header and sort by price below for a faster shopping experience.</p>
+        <p>Search from the header and use the price sort below for a focused shopping experience.</p>
       </div>
-      <div className="product-toolbar">
-        <div className="toolbar-group">
-          <span className="toolbar-label">Price sort</span>
-          <select
-            className="toolbar-select"
-            value={sortBy}
-            onChange={(e) => onSortChange && onSortChange(e.target.value)}
-          >
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="featured">Default</option>
-          </select>
+      <div className="product-toolbar-shell">
+        <div className="product-toolbar-head">
+          <div>
+            <span className="toolbar-kicker">Quick controls</span>
+            <h3>Price sorting</h3>
+            <p>Keep the view simple and sort products by your preferred price order.</p>
+          </div>
+          <div className="toolbar-count-pill">{resultLabel}</div>
         </div>
 
-        {hasActiveFilters ? (
-          <button type="button" className="toolbar-reset-btn" onClick={onClearFilters}>
-            Clear Filters
-          </button>
-        ) : null}
+        <div className="product-toolbar">
+          <div className="toolbar-group">
+            <span className="toolbar-label">Sort by price</span>
+            <select
+              className="toolbar-select"
+              value={sortBy}
+              onChange={(e) => onSortChange && onSortChange(e.target.value)}
+            >
+              <option value="featured">Default order</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+            </select>
+          </div>
+
+          {hasActiveFilters ? (
+            <button type="button" className="toolbar-reset-btn" onClick={onClearFilters}>
+              Reset View
+            </button>
+          ) : null}
+        </div>
       </div>
       <div className="product-grid">
         {list.map((product) => (
