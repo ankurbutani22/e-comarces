@@ -2566,3 +2566,178 @@ select,
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 576px) {
+  .main-content {
+    padding: 10px;
+  }
+
+  .header-inner {
+    padding: 0.62rem 0.72rem;
+    gap: 0.6rem;
+  }
+
+  .brand-text {
+    font-size: 0.94rem;
+  }
+
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+  }
+
+  .header-nav {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.2rem;
+  }
+
+  .header-nav a {
+    white-space: nowrap;
+    font-size: 0.84rem;
+    padding: 0.42rem 0.6rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .notification-panel {
+    right: 0;
+    transform: none;
+    width: min(320px, 94vw);
+  }
+
+  .page-title {
+    font-size: 1.35rem;
+  }
+
+  .page-title.small {
+    font-size: 1.2rem;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+
+  .product-image {
+    height: 180px;
+  }
+
+  .product-name {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .detail-title {
+    font-size: 1.3rem;
+  }
+
+  .detail-price {
+    font-size: 1.35rem;
+  }
+
+  .detail-action-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .detail-add-cart-btn,
+  .detail-buy-btn {
+    margin-top: 0.5rem;
+  }
+
+  .cart-table {
+    min-width: 620px;
+  }
+
+  .order-item-row,
+  .tracking-event-item,
+  .delivery-card-head,
+  .variants-header,
+  .delivery-otp-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .seller-hero-copy-wrap h2 {
+    font-size: 1.5rem;
+  }
+
+  .delivery-feature-strip {
+    gap: 0.4rem;
+  }
+
+  .size-input-group {
+    grid-template-columns: 1fr;
+  }
+
+  .order-qr-image {
+    width: 90px;
+    height: 90px;
+  }
+}
+
+@media (max-width: 420px) {
+  .header-inner {
+    padding: 0.56rem 0.58rem;
+  }
+
+  .brand-text {
+    font-size: 0.88rem;
+  }
+
+  .page-title {
+    font-size: 1.22rem;
+  }
+
+  .storefront-head h2 {
+    font-size: 1.2rem;
+  }
+
+  .notification-panel {
+    width: 96vw;
+  }
+
+  .detail-title {
+    font-size: 1.15rem;
+  }
+
+  .detail-price {
+    font-size: 1.2rem;
+  }
+
+  .chip-row {
+    gap: 0.35rem;
+  }
+
+  .option-chip {
+    font-size: 0.82rem;
+    padding: 0.42rem 0.72rem;
+  }
+
+  .auth-card,
+  .modern-auth-card,
+  .checkout-card,
+  .profile-card,
+  .order-card,
+  .cart-order-card,
+  .panel-page,
+  .delivery-card,
+  .seller-card,
+  .buy-modal-card {
+    padding: 0.75rem;
+  }
+
+  .seller-actions {
+    grid-template-columns: 1fr;
+  }
+}

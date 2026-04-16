@@ -16,49 +16,38 @@ cloudinary.config({
 const imageMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
 const videoMimes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
 
-// Cloudinary storage for images
-const imageStorage = new CloudinaryStorage({
+// Single Cloudinary storage for both images and videos.
+const mediaStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: 'ecommerce/images',
-    resource_type: 'auto',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif']
+  params: async (req, file) => {
+    const isVideo = file.fieldname === 'video';
+
+    return {
+      folder: isVideo ? 'ecommerce/videos' : 'ecommerce/images',
+      resource_type: isVideo ? 'video' : 'image',
+      allowed_formats: isVideo
+        ? ['mp4', 'webm', 'ogg', 'mov']
+        : ['jpg', 'jpeg', 'png', 'webp', 'gif']
+    };
   }
 });
 
-// Cloudinary storage for videos
-const videoStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'ecommerce/videos',
-    resource_type: 'video',
-    allowed_formats: ['mp4', 'webm', 'ogg', 'mov']
-  }
-});
-
-// Upload handler for images
-const imageUpload = multer({
-  storage: imageStorage,
-  limits: { fileSize: 50 * 1024 * 1024 },
+// Upload handler for both image and video fields.
+const mediaUpload = multer({
+  storage: mediaStorage,
+  limits: { fileSize: 100 * 1024 * 1024, files: 9 },
   fileFilter: (req, file, cb) => {
     if ((file.fieldname === 'image' || file.fieldname === 'images') && imageMimes.includes(file.mimetype)) {
       cb(null, true);
       return;
     }
-    cb(new Error('Only supported image files are allowed'));
-  }
-});
 
-// Upload handler for videos
-const videoUpload = multer({
-  storage: videoStorage,
-  limits: { fileSize: 100 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
     if (file.fieldname === 'video' && videoMimes.includes(file.mimetype)) {
       cb(null, true);
       return;
     }
-    cb(new Error('Only supported video files are allowed'));
+
+    cb(new Error('Only supported image/video files are allowed'));
   }
 });
 
@@ -66,15 +55,15 @@ router.post(
   '/media',
   protect,
   authorize('seller', 'admin'),
-  imageUpload.fields([
+  mediaUpload.fields([
     { name: 'images', maxCount: 8 },
-    { name: 'image', maxCount: 1 }
+    { name: 'image', maxCount: 1 },
+    { name: 'video', maxCount: 1 }
   ]),
-  videoUpload.single('video'),
   (req, res) => {
     try {
       const imageFiles = [...(req.files?.images || []), ...(req.files?.image || [])];
-      const videoFile = req.files?.video;
+      const videoFile = req.files?.video?.[0];
 
       if (imageFiles.length === 0 && !videoFile) {
         return res.status(400).json({
@@ -86,9 +75,9 @@ router.post(
       res.status(200).json({
         success: true,
         data: {
-          image: imageFiles[0]?.secure_url || '',
-          images: imageFiles.map((file) => file.secure_url),
-          video: videoFile?.secure_url || ''
+          image: imageFiles[0]?.path || imageFiles[0]?.secure_url || '',
+          images: imageFiles.map((file) => file.path || file.secure_url).filter(Boolean),
+          video: videoFile?.path || videoFile?.secure_url || ''
         }
       });
     } catch (error) {
