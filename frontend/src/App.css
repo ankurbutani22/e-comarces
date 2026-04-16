@@ -932,6 +932,35 @@ button:hover {
   color: rgba(255, 255, 255, 0.8);
 }
 
+.toolbar-sort-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.sort-pill-btn {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.92);
+  border-radius: 999px;
+  padding: 0.5rem 0.82rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.sort-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.sort-pill-btn.active {
+  background: rgba(255, 255, 255, 0.94);
+  color: #184c63;
+  border-color: rgba(255, 255, 255, 0.95);
+}
+
 .toolbar-select {
   width: 100%;
   min-width: 0;
@@ -952,6 +981,10 @@ button:hover {
   border: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow: none;
   white-space: nowrap;
+}
+
+.toolbar-reset-btn {
+  justify-self: end;
 }
 
 .toolbar-reset-btn:hover {
@@ -2800,6 +2833,7 @@ select,
 
   .toolbar-reset-btn {
     grid-column: 1 / -1;
+    justify-self: stretch;
   }
 
   .product-image {
@@ -2928,6 +2962,16 @@ select,
   .product-toolbar {
     grid-template-columns: 1fr;
     padding: 0.8rem;
+  }
+
+  .toolbar-sort-options {
+    gap: 0.35rem;
+  }
+
+  .sort-pill-btn {
+    flex: 1 1 calc(50% - 0.35rem);
+    text-align: center;
+    justify-content: center;
   }
 
   .storefront-shell {

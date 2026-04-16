@@ -13,6 +13,11 @@ function ProductList({
 }) {
   const list = Array.isArray(products) ? products : [];
   const hasActiveFilters = searchQuery.trim() || sortBy !== 'featured';
+  const sortOptions = [
+    { value: 'featured', label: 'Default' },
+    { value: 'price-low', label: 'Price Low to High' },
+    { value: 'price-high', label: 'Price High to Low' }
+  ];
   const resultLabel = searchQuery.trim()
     ? `${list.length} result${list.length === 1 ? '' : 's'} found`
     : `${list.length} product${list.length === 1 ? '' : 's'} available`;
@@ -58,15 +63,19 @@ function ProductList({
         <div className="product-toolbar">
           <div className="toolbar-group">
             <span className="toolbar-label">Sort by price</span>
-            <select
-              className="toolbar-select"
-              value={sortBy}
-              onChange={(e) => onSortChange && onSortChange(e.target.value)}
-            >
-              <option value="featured">Default order</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-            </select>
+            <div className="toolbar-sort-options" role="group" aria-label="Sort products by price">
+              {sortOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={`sort-pill-btn ${sortBy === option.value ? 'active' : ''}`}
+                  onClick={() => onSortChange && onSortChange(option.value)}
+                  aria-pressed={sortBy === option.value}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {hasActiveFilters ? (
