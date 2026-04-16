@@ -18,6 +18,9 @@ import DeliveryPanel from './pages/DeliveryPanel';
 import SellerPanel from './pages/SellerPanel';
 import Unauthorized from './pages/Unauthorized';
 
+const THEME_STORAGE_KEY = 'ui-theme';
+const AVAILABLE_THEMES = new Set(['ocean', 'sandstone', 'midnight']);
+
 function App() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,6 +29,10 @@ function App() {
   const [token, setToken] = useState(() => localStorage.getItem('token') || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('featured');
+  const [themeId, setThemeId] = useState(() => {
+    const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'ocean';
+    return AVAILABLE_THEMES.has(savedTheme) ? savedTheme : 'ocean';
+  });
 
   const visibleProducts = useMemo(() => {
     if (!user || user.role !== 'seller') {
@@ -71,6 +78,15 @@ function App() {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    document.body.setAttribute('data-theme', themeId);
+    localStorage.setItem(THEME_STORAGE_KEY, themeId);
+
+    return () => {
+      document.body.removeAttribute('data-theme');
+    };
+  }, [themeId]);
 
   const fetchProducts = async () => {
     try {
@@ -122,6 +138,8 @@ function App() {
           onLogout={handleLogout}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
+          themeId={themeId}
+          onThemeChange={setThemeId}
         />
         <main className="main-content">
           <Routes>

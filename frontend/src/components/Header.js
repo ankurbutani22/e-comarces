@@ -5,7 +5,7 @@ import { getDeliveryOrders, getMyOrders, getSellerOrders } from '../services/aut
 const PROFILE_PLACEHOLDER =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="32" fill="%23dbeafe"/><circle cx="32" cy="25" r="12" fill="%236b7280"/><path d="M14 52c3-9 9-14 18-14s15 5 18 14" fill="%236b7280"/></svg>';
 
-function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
+function Header({ user, token, onLogout, searchQuery, onSearchChange, themeId, onThemeChange }) {
   const navigate = useNavigate();
   const location = useLocation();
   const canUseCart = user && (user.role === 'user' || user.role === 'admin');
@@ -100,6 +100,20 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
           </Link>
 
           <div className="header-actions">
+            <div className="theme-switch-wrap">
+              <label htmlFor="theme-switch" className="theme-switch-label">Theme</label>
+              <select
+                id="theme-switch"
+                className="theme-switch-select"
+                value={themeId}
+                onChange={(e) => onThemeChange && onThemeChange(e.target.value)}
+              >
+                <option value="ocean">Ocean Premium</option>
+                <option value="sandstone">Sandstone Luxe</option>
+                <option value="midnight">Midnight Steel</option>
+              </select>
+            </div>
+
             {user ? (
               <div className="notification-wrap" ref={notificationRef}>
                 <button
