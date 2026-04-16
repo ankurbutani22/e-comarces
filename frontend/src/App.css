@@ -3033,3 +3033,189 @@ select,
     grid-template-columns: 1fr;
   }
 }
+
+/* Premium global theme layer */
+:root {
+  --premium-ink: #132331;
+  --premium-subtle: #4f6477;
+  --premium-line: #c9d8e5;
+  --premium-surface: #f7fbff;
+  --premium-surface-2: #eef5fb;
+  --premium-brand: #1e5d77;
+  --premium-brand-strong: #154a60;
+  --premium-warm: #c27a2c;
+  --premium-shadow: 0 20px 44px rgba(14, 39, 58, 0.12);
+}
+
+body {
+  color: var(--premium-ink);
+  background:
+    radial-gradient(circle at 8% 0%, rgba(44, 103, 136, 0.2), transparent 36%),
+    radial-gradient(circle at 100% 100%, rgba(194, 122, 44, 0.12), transparent 32%),
+    linear-gradient(180deg, #e8f0f6 0%, #e3edf4 100%);
+}
+
+.main-content {
+  max-width: 1320px;
+}
+
+.page-title,
+.storefront-head h2,
+.detail-title,
+.auth-side-panel h2,
+.seller-hero-copy-wrap h2 {
+  letter-spacing: -0.02em;
+}
+
+.profile-card,
+.scanner-video-card,
+.scanner-result-card,
+.cart-empty-card,
+.checkout-card,
+.cart-order-card,
+.order-card,
+.panel-page,
+.delivery-card,
+.seller-card,
+.auth-shell,
+.buy-modal-card,
+.tracking-card,
+.notification-panel,
+.variant-card {
+  border-radius: 22px;
+  border: 1px solid var(--premium-line);
+  background: linear-gradient(180deg, var(--premium-surface) 0%, var(--premium-surface-2) 100%);
+  box-shadow: var(--premium-shadow);
+}
+
+.product-card {
+  border-radius: 22px;
+  border: 1px solid var(--premium-line);
+  box-shadow: 0 16px 32px rgba(15, 35, 52, 0.1);
+}
+
+.product-card:hover,
+.order-card:hover,
+.delivery-card:hover,
+.seller-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 46px rgba(15, 35, 52, 0.17);
+}
+
+.product-price,
+.detail-price,
+.order-total,
+.cart-order-total {
+  color: var(--premium-brand-strong);
+}
+
+button,
+.auth-link,
+.link-button.logout-btn,
+.primary-btn,
+.delivery-city-btn,
+.delivery-delivered-btn,
+.detail-add-cart-btn,
+.detail-buy-btn,
+.checkout-confirm-btn,
+.buy-confirm-btn,
+.unauthorized-link {
+  border-radius: 14px;
+  border: 1px solid rgba(17, 56, 78, 0.16);
+  box-shadow: 0 10px 18px rgba(15, 35, 52, 0.12);
+}
+
+button:hover,
+.auth-link:hover,
+.link-button.logout-btn:hover,
+.primary-btn:hover,
+.delivery-city-btn:hover,
+.delivery-delivered-btn:hover,
+.detail-add-cart-btn:hover,
+.detail-buy-btn:hover,
+.checkout-confirm-btn:hover,
+.buy-confirm-btn:hover,
+.unauthorized-link:hover {
+  filter: saturate(1.08);
+}
+
+input,
+textarea,
+select,
+.auth-card input,
+.auth-card select,
+.profile-form input,
+.profile-form textarea,
+.checkout-card input,
+.checkout-card textarea,
+.product-form-grid input,
+.product-form-grid select,
+.product-form-grid textarea,
+.variant-name-input,
+.size-input-group input,
+.toolbar-select,
+.header-search-box {
+  border-color: #bfd0de;
+  background: #f9fcff;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.header-search-input:focus {
+  outline: 2px solid rgba(30, 93, 119, 0.22);
+  outline-offset: 1px;
+}
+
+.cart-table-wrap {
+  border-radius: 20px;
+  border-color: var(--premium-line);
+}
+
+.cart-table thead {
+  background: linear-gradient(180deg, #edf4fa 0%, #e6eff7 100%);
+}
+
+.cart-table th {
+  color: #203242;
+  font-weight: 800;
+}
+
+.product-toolbar-shell,
+.header-top-row,
+.header-bottom-row {
+  border-radius: 18px;
+}
+
+.storefront-kicker,
+.toolbar-kicker,
+.section-kicker,
+.eyebrow {
+  color: var(--premium-warm);
+}
+
+.status-chip,
+.count-chip,
+.tracking-pill {
+  border-radius: 999px;
+  border-width: 1px;
+}
+
+@media (max-width: 768px) {
+  .profile-card,
+  .scanner-result-card,
+  .checkout-card,
+  .order-card,
+  .cart-order-card,
+  .panel-page,
+  .delivery-card,
+  .seller-card,
+  .buy-modal-card,
+  .product-card {
+    border-radius: 18px;
+  }
+
+  .main-content {
+    padding: 12px;
+  }
+}
