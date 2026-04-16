@@ -1,7 +1,6 @@
 const express = require('express');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -16,25 +15,9 @@ cloudinary.config({
 const imageMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
 const videoMimes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
 
-// Single Cloudinary storage for both images and videos.
-const mediaStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: async (req, file) => {
-    const isVideo = file.fieldname === 'video';
-
-    return {
-      folder: isVideo ? 'ecommerce/videos' : 'ecommerce/images',
-      resource_type: isVideo ? 'video' : 'image',
-      allowed_formats: isVideo
-        ? ['mp4', 'webm', 'ogg', 'mov']
-        : ['jpg', 'jpeg', 'png', 'webp', 'gif']
-    };
-  }
-});
-
 // Upload handler for both image and video fields.
 const mediaUpload = multer({
-  storage: mediaStorage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 100 * 1024 * 1024, files: 9 },
   fileFilter: (req, file, cb) => {
     if ((file.fieldname === 'image' || file.fieldname === 'images') && imageMimes.includes(file.mimetype)) {
@@ -51,6 +34,18 @@ const mediaUpload = multer({
   }
 });
 
+const uploadBufferToCloudinary = (file, options) => new Promise((resolve, reject) => {
+  const uploadStream = cloudinary.uploader.upload_stream(options, (error, result) => {
+    if (error) {
+      reject(error);
+      return;
+    }
+    resolve(result);
+  });
+
+  uploadStream.end(file.buffer);
+});
+
 router.post(
   '/media',
   protect,
@@ -60,7 +55,7 @@ router.post(
     { name: 'image', maxCount: 1 },
     { name: 'video', maxCount: 1 }
   ]),
-  (req, res) => {
+  async (req, res) => {
     try {
       const imageFiles = [...(req.files?.images || []), ...(req.files?.image || [])];
       const videoFile = req.files?.video?.[0];
@@ -72,12 +67,29 @@ router.post(
         });
       }
 
+      const uploadedImages = await Promise.all(
+        imageFiles.map((file) =>
+          uploadBufferToCloudinary(file, {
+            folder: 'ecommerce/images',
+            resource_type: 'image'
+          })
+        )
+      );
+
+      let uploadedVideo = null;
+      if (videoFile) {
+        uploadedVideo = await uploadBufferToCloudinary(videoFile, {
+          folder: 'ecommerce/videos',
+          resource_type: 'video'
+        });
+      }
+
       res.status(200).json({
         success: true,
         data: {
-          image: imageFiles[0]?.path || imageFiles[0]?.secure_url || '',
-          images: imageFiles.map((file) => file.path || file.secure_url).filter(Boolean),
-          video: videoFile?.path || videoFile?.secure_url || ''
+          image: uploadedImages[0]?.secure_url || '',
+          images: uploadedImages.map((file) => file.secure_url).filter(Boolean),
+          video: uploadedVideo?.secure_url || ''
         }
       });
     } catch (error) {
