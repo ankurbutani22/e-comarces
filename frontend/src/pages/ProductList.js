@@ -7,15 +7,12 @@ function ProductList({
   error,
   onRefresh,
   searchQuery = '',
-  selectedCategory = 'all',
   sortBy = 'featured',
-  categoryOptions = ['all'],
-  onCategoryChange,
   onSortChange,
   onClearFilters
 }) {
   const list = Array.isArray(products) ? products : [];
-  const hasActiveFilters = searchQuery.trim() || selectedCategory !== 'all' || sortBy !== 'featured';
+  const hasActiveFilters = searchQuery.trim() || sortBy !== 'featured';
 
   if (loading) {
     return <div className="loading">Loading products...</div>;
@@ -41,37 +38,21 @@ function ProductList({
   return (
     <div className="storefront-shell">
       <div className="storefront-head">
-        <h2>Featured Products</h2>
-        <p>Curated picks with premium quality and fast delivery.</p>
+        <div className="storefront-kicker">Featured Collection</div>
+        <h2>Discover products with a cleaner browsing flow</h2>
+        <p>Search from the header and sort by price below for a faster shopping experience.</p>
       </div>
       <div className="product-toolbar">
         <div className="toolbar-group">
-          <span className="toolbar-label">Category</span>
-          <select
-            className="toolbar-select"
-            value={selectedCategory}
-            onChange={(e) => onCategoryChange && onCategoryChange(e.target.value)}
-          >
-            {categoryOptions.map((category) => (
-              <option key={category} value={category}>
-                {category === 'all' ? 'All categories' : category}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="toolbar-group">
-          <span className="toolbar-label">Sort by</span>
+          <span className="toolbar-label">Price sort</span>
           <select
             className="toolbar-select"
             value={sortBy}
             onChange={(e) => onSortChange && onSortChange(e.target.value)}
           >
-            <option value="featured">Featured</option>
             <option value="price-low">Price: Low to High</option>
             <option value="price-high">Price: High to Low</option>
-            <option value="name-az">Name: A to Z</option>
-            <option value="stock-high">Stock: High to Low</option>
+            <option value="featured">Default</option>
           </select>
         </div>
 

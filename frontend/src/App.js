@@ -25,7 +25,6 @@ function App() {
   const [user, setUser] = useState(() => readLocalJson('user', null));
   const [token, setToken] = useState(() => localStorage.getItem('token') || '');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('featured');
 
   const visibleProducts = useMemo(() => {
@@ -47,58 +46,27 @@ function App() {
 
   const filteredProducts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    const category = selectedCategory.trim().toLowerCase();
     let nextProducts = [...visibleProducts];
-
-    if (category && category !== 'all') {
-      nextProducts = nextProducts.filter((product) => {
-        const productCategory = String(product?.category || '').trim().toLowerCase();
-        return productCategory === category;
-      });
-    }
 
     if (query) {
       nextProducts = nextProducts.filter((product) => {
-      const haystack = [product?.name, product?.category, product?.description]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
+        const haystack = [product?.name, product?.category, product?.description]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
 
-      return haystack.includes(query);
-    });
+        return haystack.includes(query);
+      });
     }
 
     if (sortBy === 'price-low') {
       nextProducts.sort((left, right) => Number(left?.price || 0) - Number(right?.price || 0));
     } else if (sortBy === 'price-high') {
       nextProducts.sort((left, right) => Number(right?.price || 0) - Number(left?.price || 0));
-    } else if (sortBy === 'name-az') {
-      nextProducts.sort((left, right) => String(left?.name || '').localeCompare(String(right?.name || '')));
-    } else if (sortBy === 'stock-high') {
-      nextProducts.sort((left, right) => Number(right?.stock || 0) - Number(left?.stock || 0));
     }
 
     return nextProducts;
-  }, [visibleProducts, searchQuery, selectedCategory, sortBy]);
-
-  const categoryOptions = useMemo(() => {
-    const seen = new Set();
-    const categories = [];
-
-    visibleProducts.forEach((product) => {
-      const category = String(product?.category || '').trim();
-      const key = category.toLowerCase();
-
-      if (!category || seen.has(key)) {
-        return;
-      }
-
-      seen.add(key);
-      categories.push(category);
-    });
-
-    return ['all', ...categories];
-  }, [visibleProducts]);
+  }, [visibleProducts, searchQuery, sortBy]);
 
   useEffect(() => {
     fetchProducts();
@@ -166,14 +134,10 @@ function App() {
                   error={error} 
                   onRefresh={fetchProducts}
                   searchQuery={searchQuery}
-                  selectedCategory={selectedCategory}
                   sortBy={sortBy}
-                  categoryOptions={categoryOptions}
-                  onCategoryChange={setSelectedCategory}
                   onSortChange={setSortBy}
                   onClearFilters={() => {
                     setSearchQuery('');
-                    setSelectedCategory('all');
                     setSortBy('featured');
                   }}
                 />
