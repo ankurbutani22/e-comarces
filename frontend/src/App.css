@@ -198,10 +198,33 @@ body {
   font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.01em;
+  caret-color: #1e5d77;
+  -webkit-text-fill-color: #133144;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: none;
 }
 
 .header-search-input::placeholder {
   color: #6a8396;
+  opacity: 1;
+}
+
+input.header-search-input {
+  border: 0 !important;
+  background: transparent !important;
+  color: #133144 !important;
+}
+
+input.header-search-input::placeholder {
+  color: #6a8396 !important;
+  opacity: 1;
+}
+
+input.header-search-input::-webkit-search-cancel-button,
+input.header-search-input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .header-search-clear {
