@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
+import { readLocalJson } from './utils/storage';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProductList from './pages/ProductList';
@@ -21,10 +22,7 @@ function App() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [user, setUser] = useState(() => {
-    const raw = localStorage.getItem('user');
-    return raw ? JSON.parse(raw) : null;
-  });
+  const [user, setUser] = useState(() => readLocalJson('user', null));
   const [token, setToken] = useState(() => localStorage.getItem('token') || '');
 
   const visibleProducts = React.useMemo(() => {
@@ -52,7 +50,15 @@ function App() {
     try {
       setLoading(true);
       const response = await axios.get('/api/products');
-      setProducts(response.data.data);
+
+      const payload = response?.data;
+      const nextProducts = Array.isArray(payload)
+        ? payload
+        : Array.isArray(payload?.data)
+          ? payload.data
+          : [];
+
+      setProducts(nextProducts);
       setError(null);
     } catch (err) {
       setError('Failed to fetch products');

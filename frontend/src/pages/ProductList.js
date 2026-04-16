@@ -2,6 +2,8 @@ import React from 'react';
 import ProductCard from '../components/ProductCard';
 
 function ProductList({ products, loading, error, onRefresh }) {
+  const list = Array.isArray(products) ? products : [];
+
   if (loading) {
     return <div className="loading">Loading products...</div>;
   }
@@ -15,7 +17,7 @@ function ProductList({ products, loading, error, onRefresh }) {
     );
   }
 
-  if (products.length === 0) {
+  if (list.length === 0) {
     return <div className="loading">No products available</div>;
   }
 
@@ -26,7 +28,7 @@ function ProductList({ products, loading, error, onRefresh }) {
         <p>Curated picks with premium quality and fast delivery.</p>
       </div>
       <div className="product-grid">
-        {products.map((product) => (
+        {list.map((product) => (
           <ProductCard key={product._id} product={product} />
         ))}
       </div>

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createOrder, getMyOrders, getProfile } from '../services/authService';
+import { readLocalJson } from '../utils/storage';
 
 function Cart() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ function Cart() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [myOrders, setMyOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
-  const [user] = useState(() => JSON.parse(localStorage.getItem('user') || 'null'));
+  const [user] = useState(() => readLocalJson('user', null));
   const [token] = useState(() => localStorage.getItem('token') || '');
 
   useEffect(() => {
@@ -42,7 +43,7 @@ function Cart() {
         setShippingAddress(profileUser.address || '');
 
         const mergedUser = {
-          ...(JSON.parse(localStorage.getItem('user') || '{}')),
+          ...(readLocalJson('user', {})),
           ...profileUser,
           id: profileUser._id || profileUser.id || user.id
         };
@@ -63,7 +64,7 @@ function Cart() {
   }, [user, navigate]);
 
   useEffect(() => {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = readLocalJson('cart', []) || [];
     setCartItems(cart);
   }, []);
 

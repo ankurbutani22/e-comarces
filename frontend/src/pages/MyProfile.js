@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getProfile, updateProfile } from '../services/authService';
+import { readLocalJson } from '../utils/storage';
 
 function MyProfile({ token, onProfileUpdated }) {
   const [form, setForm] = useState({
@@ -66,7 +67,7 @@ function MyProfile({ token, onProfileUpdated }) {
       });
 
       const updatedUser = {
-        ...(JSON.parse(localStorage.getItem('user') || '{}')),
+        ...(readLocalJson('user', {})),
         ...response.user,
         id: response.user?._id || response.user?.id
       };

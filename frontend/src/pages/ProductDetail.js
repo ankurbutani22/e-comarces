@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { createOrder } from '../services/authService';
+import { readLocalJson } from '../utils/storage';
 
 const MEDIA_PLACEHOLDER =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800"><rect width="800" height="800" fill="%23e9eef3"/><rect x="220" y="220" width="360" height="360" rx="18" fill="%23ffffff" stroke="%23b8c4d1" stroke-width="8"/><circle cx="330" cy="340" r="34" fill="%2394a7ba"/><path d="M250 500l95-95 80 80 70-70 55 55v70H250z" fill="%23b6c5d5"/><text x="400" y="610" font-family="Segoe UI, Arial" font-size="32" text-anchor="middle" fill="%23667a8f">No product image</text></svg>';
@@ -25,7 +26,7 @@ const resolveMediaUrl = (value) => {
 function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const user = readLocalJson('user', null);
   const isSeller = user?.role === 'seller';
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -71,7 +72,7 @@ function ProductDetail() {
 
     const cartKey = `${product._id}__${selectedSize || 'nosize'}__${selectedVariant?.name || 'nodefault'}`;
 
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cart = readLocalJson('cart', []);
     const existing = cart.find((item) => item.cartKey === cartKey);
 
     if (existing) {
