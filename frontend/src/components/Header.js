@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { getDeliveryOrders, getMyOrders, getSellerOrders } from '../services/authService';
 
 const PROFILE_PLACEHOLDER =
@@ -80,6 +80,15 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
   };
 
   const showSearch = location.pathname === '/';
+  const navItems = [
+    { to: '/', label: 'Home' },
+    ...(canUseCart ? [{ to: '/cart', label: 'Cart' }] : []),
+    ...(canSeeOrders ? [{ to: '/orders', label: 'My Orders' }] : []),
+    ...(canUseScanner ? [{ to: '/seller/scan', label: 'QR Scanner' }] : []),
+    ...(canUseDeliveryPanel ? [{ to: '/delivery', label: 'Delivery Panel' }] : []),
+    ...(user?.role === 'admin' ? [{ to: '/admin', label: 'Admin Panel' }] : []),
+    ...(user?.role === 'seller' ? [{ to: '/seller', label: 'Seller Panel' }] : [])
+  ];
 
   return (
     <header className="app-header">
@@ -176,13 +185,16 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
 
         <div className="header-bottom-row">
           <nav className="header-nav">
-            <Link to="/">Home</Link>
-            {canUseCart ? <Link to="/cart">Cart</Link> : null}
-            {canSeeOrders ? <Link to="/orders">My Orders</Link> : null}
-            {canUseScanner ? <Link to="/seller/scan">QR Scanner</Link> : null}
-            {canUseDeliveryPanel ? <Link to="/delivery">Delivery Panel</Link> : null}
-            {user?.role === 'admin' ? <Link to="/admin">Admin Panel</Link> : null}
-            {user?.role === 'seller' ? <Link to="/seller">Seller Panel</Link> : null}
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === '/'}
+                className={({ isActive }) => `header-nav-link${isActive ? ' active' : ''}`}
+              >
+                {item.label}
+              </NavLink>
+            ))}
           </nav>
 
           {showSearch ? (
