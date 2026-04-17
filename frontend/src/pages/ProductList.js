@@ -48,7 +48,7 @@ function ProductList({
   onSortChange,
   onClearFilters
 }) {
-  const list = Array.isArray(products) ? products : [];
+  const list = useMemo(() => (Array.isArray(products) ? products : []), [products]);
   const [ads, setAds] = useState([]);
   const [activeSlide, setActiveSlide] = useState(0);
   const hasActiveFilters = searchQuery.trim() || sortBy !== 'featured';
