@@ -60,42 +60,36 @@ function ProductList({
   }, []);
 
   const carouselSlides = useMemo(() => {
-    const adminSlides = (Array.isArray(ads) ? ads : [])
+    return (Array.isArray(ads) ? ads : [])
       .filter((ad) => ad?.image)
       .map((ad) => ({
-        image: resolveMediaUrl(ad.image),
-        title: ad.productName || ad.title || '',
-        subtitle: ad.content || ad.subtitle || '',
-        companyName: ad.companyName || ''
+        image: resolveMediaUrl(ad.image)
       }))
       .filter((ad) => ad.image)
-      .slice(0, 8);
-
-    return adminSlides;
+      .slice(0, 20);
   }, [ads]);
+
+  const groupedSlides = useMemo(() => {
+    const groups = [];
+    for (let index = 0; index < carouselSlides.length; index += 4) {
+      groups.push(carouselSlides.slice(index, index + 4));
+    }
+    return groups;
+  }, [carouselSlides]);
 
   useEffect(() => {
     setActiveSlide(0);
-  }, [carouselSlides.length]);
+  }, [groupedSlides.length]);
 
   useEffect(() => {
-    if (carouselSlides.length <= 1) return undefined;
+    if (groupedSlides.length <= 1) return undefined;
 
     const timer = window.setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % carouselSlides.length);
+      setActiveSlide((prev) => (prev + 1) % groupedSlides.length);
     }, 4200);
 
     return () => window.clearInterval(timer);
-  }, [carouselSlides.length]);
-
-  const getSlideByOffset = (offset) => {
-    if (carouselSlides.length === 0) return null;
-    const index = (activeSlide + offset + carouselSlides.length) % carouselSlides.length;
-    return carouselSlides[index] || null;
-  };
-
-  const leftCardSlide = getSlideByOffset(1);
-  const rightCardSlide = getSlideByOffset(2);
+  }, [groupedSlides.length]);
 
   if (loading) {
     return <div className="loading">Loading products...</div>;
@@ -112,52 +106,32 @@ function ProductList({
 
   return (
     <div className="storefront-shell">
-      {carouselSlides.length > 0 ? (
-        <section
-          className={`home-ad-showcase ${carouselSlides.length > 2 ? 'has-side-ads' : 'single-focus'}`}
-          aria-label="Featured ads showcase"
-        >
-          {carouselSlides.length > 2 ? (
-            <article className="home-side-ad-card left" aria-hidden="true">
-              <img src={leftCardSlide?.image} alt={leftCardSlide?.title || 'Ad'} className="home-side-ad-image" />
-            </article>
-          ) : null}
-
-          <div className="home-carousel home-carousel-main">
-            <div className="home-carousel-track" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
-              {carouselSlides.map((slide, index) => (
-                <article className="home-carousel-slide" key={`${slide.image}-${index}`}>
-                  <img src={slide.image} alt={slide.title || 'Ad banner'} className="home-carousel-image" />
-                  {(slide.companyName || slide.title || slide.subtitle) ? (
-                    <div className="home-carousel-overlay">
-                      {slide.companyName ? <p className="home-carousel-kicker">{slide.companyName}</p> : null}
-                      {slide.title ? <h3>{slide.title}</h3> : null}
-                      {slide.subtitle ? <p>{slide.subtitle}</p> : null}
-                    </div>
-                  ) : null}
-                </article>
-              ))}
-            </div>
-
-            {carouselSlides.length > 1 ? (
-              <div className="home-carousel-dots">
-                {carouselSlides.map((_, index) => (
-                  <button
-                    key={`dot-${index}`}
-                    type="button"
-                    className={`home-carousel-dot ${activeSlide === index ? 'active' : ''}`}
-                    onClick={() => setActiveSlide(index)}
-                    aria-label={`Go to slide ${index + 1}`}
-                  />
+      {groupedSlides.length > 0 ? (
+        <section className="home-ad-grid-carousel" aria-label="Featured ads showcase">
+          <div className="home-ad-grid-track" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
+            {groupedSlides.map((slideGroup, groupIndex) => (
+              <div className="home-ad-grid-page" key={`group-${groupIndex}`}>
+                {slideGroup.map((slide, itemIndex) => (
+                  <article className="home-ad-grid-item" key={`${slide.image}-${groupIndex}-${itemIndex}`}>
+                    <img src={slide.image} alt="Ad banner" className="home-ad-grid-image" />
+                  </article>
                 ))}
               </div>
-            ) : null}
+            ))}
           </div>
 
-          {carouselSlides.length > 2 ? (
-            <article className="home-side-ad-card right" aria-hidden="true">
-              <img src={rightCardSlide?.image} alt={rightCardSlide?.title || 'Ad'} className="home-side-ad-image" />
-            </article>
+          {groupedSlides.length > 1 ? (
+            <div className="home-carousel-dots">
+              {groupedSlides.map((_, index) => (
+                <button
+                  key={`dot-${index}`}
+                  type="button"
+                  className={`home-carousel-dot ${activeSlide === index ? 'active' : ''}`}
+                  onClick={() => setActiveSlide(index)}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
           ) : null}
         </section>
       ) : null}
