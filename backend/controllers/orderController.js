@@ -131,6 +131,12 @@ const normalizeTextValue = (value) => {
   return String(value).trim();
 };
 
+const getDiscountedUnitPrice = (product) => {
+  const basePrice = Number(product?.price || 0);
+  const discountPercent = Math.min(95, Math.max(0, Number(product?.discountPercent || 0)));
+  return Math.max(0, Math.round(basePrice - (basePrice * discountPercent) / 100));
+};
+
 exports.createOrder = async (req, res) => {
   try {
     const { items, shippingAddress, customerName, customerPhone, paymentMethod } = req.body;
@@ -290,7 +296,7 @@ exports.createOrder = async (req, res) => {
         }
       }
 
-      const linePrice = Number(matched.price);
+      const linePrice = getDiscountedUnitPrice(matched);
       totalAmount += linePrice * quantity;
 
       const selectedVariantImage =

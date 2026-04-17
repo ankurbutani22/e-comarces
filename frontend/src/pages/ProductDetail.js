@@ -47,6 +47,9 @@ function ProductDetail() {
   const [buyCardHolder, setBuyCardHolder] = useState('');
   const [buyCardExpiry, setBuyCardExpiry] = useState('');
   const [buyCardCvv, setBuyCardCvv] = useState('');
+  const basePrice = Number(product?.price || 0);
+  const discountPercent = Math.min(95, Math.max(0, Number(product?.discountPercent || 0)));
+  const discountedPrice = Math.max(0, Math.round(basePrice - (basePrice * discountPercent) / 100));
 
   const handleAddToCart = () => {
     if (isSeller) {
@@ -102,6 +105,8 @@ function ProductDetail() {
     } else {
       cart.push({
         ...product,
+        originalPrice: basePrice,
+        price: discountedPrice,
         quantity: 1,
         cartKey,
         selectedSize: selectedSize || '',
@@ -406,7 +411,16 @@ function ProductDetail() {
 
         <div className="product-meta-column">
           <h1 className="detail-title">{product.name}</h1>
-          <p className="detail-price">₹{product.price}</p>
+          <p className="detail-price">
+            ₹{discountedPrice}
+            {discountPercent > 0 ? (
+              <>
+                {' '}
+                <span style={{ textDecoration: 'line-through', opacity: 0.65, marginLeft: '0.4rem' }}>₹{basePrice}</span>
+                <span style={{ marginLeft: '0.4rem', color: '#0f766e', fontWeight: 700 }}>-{discountPercent}%</span>
+              </>
+            ) : null}
+          </p>
 
           <p className="detail-description">
             {product.description}
@@ -562,7 +576,10 @@ function ProductDetail() {
         <div className="buy-modal-backdrop" role="dialog" aria-modal="true" aria-label="Buy Order">
           <div className="buy-modal-card">
             <h3>Confirm Order</h3>
-            <p className="buy-modal-subtitle">{product.name} - ₹{product.price}</p>
+            <p className="buy-modal-subtitle">
+              {product.name} - ₹{discountedPrice}
+              {discountPercent > 0 ? ` (MRP ₹${basePrice}, ${discountPercent}% off)` : ''}
+            </p>
             {selectedSize ? <p className="buy-modal-subtitle">Size: {selectedSize}</p> : null}
             {selectedRamSize ? <p className="buy-modal-subtitle">RAM: {selectedRamSize}</p> : null}
             {selectedRomSize ? <p className="buy-modal-subtitle">ROM: {selectedRomSize}</p> : null}

@@ -36,6 +36,7 @@ function SellerPanel({ token, onProductAdded }) {
     name: '',
     description: '',
     price: '',
+    discountPercent: '',
     category: 'Electronics',
     stock: '',
     image: '',
@@ -72,6 +73,10 @@ function SellerPanel({ token, onProductAdded }) {
     orders: sellerOrders.length,
     mediaReady: (form.images?.length || 0) + (form.video ? 1 : 0)
   }), [form.images, form.video, myProducts.length, sellerOrders.length]);
+
+  const formBasePrice = Number(form.price || 0);
+  const formDiscountPercent = Math.min(95, Math.max(0, Number(form.discountPercent || 0)));
+  const formDiscountedPrice = Math.max(0, Math.round(formBasePrice - (formBasePrice * formDiscountPercent) / 100));
 
   const categoryOptionPresets = useMemo(() => ({
     Electronics: ['Warranty', 'Color', 'Plug Type'],
@@ -241,6 +246,7 @@ function SellerPanel({ token, onProductAdded }) {
         name: form.name,
         description: form.description,
         price: Number(form.price),
+        discountPercent: Number(form.discountPercent || 0),
         category: form.category,
         stock: Number(form.stock),
         image: uploadedImage || undefined,
@@ -263,6 +269,7 @@ function SellerPanel({ token, onProductAdded }) {
         name: '',
         description: '',
         price: '',
+        discountPercent: '',
         category: 'Electronics',
         stock: '',
         image: '',
@@ -376,6 +383,77 @@ function SellerPanel({ token, onProductAdded }) {
       setSuccess('Price updated');
     } catch (err) {
       setError(err.response?.data?.message || 'Price update failed');
+    } finally {
+      setActionLoadingId('');
+    }
+  };
+
+  const editProduct = async (product) => {
+    const allowedCategories = ['Electronics', 'Clothing', 'Mobile', 'Cosmetic', 'Novelty', 'Books', 'Home', 'Sports', 'Other'];
+
+    const name = window.prompt('Product name:', product.name || '');
+    if (name === null) return;
+
+    const description = window.prompt('Description:', product.description || '');
+    if (description === null) return;
+
+    const priceText = window.prompt('Price (Rs.):', String(product.price || 0));
+    if (priceText === null) return;
+
+    const stockText = window.prompt('Stock:', String(product.stock || 0));
+    if (stockText === null) return;
+
+    const discountText = window.prompt('Discount % (0-95):', String(product.discountPercent || 0));
+    if (discountText === null) return;
+
+    const categoryText = window.prompt(
+      `Category (${allowedCategories.join(', ')}):`,
+      product.category || 'Electronics'
+    );
+    if (categoryText === null) return;
+
+    const nextPrice = Number(priceText);
+    const nextStock = Number(stockText);
+    const nextDiscount = Number(discountText);
+    const nextCategory = String(categoryText).trim();
+
+    if (!Number.isFinite(nextPrice) || nextPrice < 0) {
+      setError('Invalid price value');
+      return;
+    }
+
+    if (!Number.isFinite(nextStock) || nextStock < 0) {
+      setError('Invalid stock value');
+      return;
+    }
+
+    if (!Number.isFinite(nextDiscount) || nextDiscount < 0 || nextDiscount > 95) {
+      setError('Discount must be between 0 and 95');
+      return;
+    }
+
+    if (!allowedCategories.includes(nextCategory)) {
+      setError('Invalid category value');
+      return;
+    }
+
+    setError('');
+    setSuccess('');
+    setActionLoadingId(product._id);
+
+    try {
+      await updateSellerProduct(token, product._id, {
+        name: String(name).trim(),
+        description: String(description).trim(),
+        price: nextPrice,
+        stock: nextStock,
+        discountPercent: nextDiscount,
+        category: nextCategory
+      });
+      await refreshProducts();
+      setSuccess('Product updated');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Product update failed');
     } finally {
       setActionLoadingId('');
     }
@@ -590,6 +668,24 @@ function SellerPanel({ token, onProductAdded }) {
                   onChange={onChange}
                   required
                 />
+              </div>
+
+              <div>
+                <label>Discount (%)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="95"
+                  step="1"
+                  name="discountPercent"
+                  placeholder="e.g., 3"
+                  value={form.discountPercent}
+                  onChange={onChange}
+                />
+                <p className="info-text" style={{ marginTop: '0.4rem' }}>
+                  Final selling price: Rs. {formDiscountedPrice}
+                  {formDiscountPercent > 0 ? ` (MRP Rs. ${formBasePrice})` : ''}
+                </p>
               </div>
 
               <div>
@@ -861,14 +957,22 @@ function SellerPanel({ token, onProductAdded }) {
 
             {!tableLoading && myProducts.length > 0 ? (
               <div className="seller-products-grid">
-                {myProducts.map((product) => (
+                {myProducts.map((product) => {
+                  const basePrice = Number(product.price || 0);
+                  const discountPercent = Math.min(95, Math.max(0, Number(product.discountPercent || 0)));
+                  const discountedPrice = Math.max(0, Math.round(basePrice - (basePrice * discountPercent) / 100));
+
+                  return (
                   <article className="seller-card" key={product._id}>
                     <div className="seller-card-media">
                       <img src={product.image} alt={product.name} />
                       {product.video ? <span className="media-badge">Video</span> : null}
                     </div>
                     <h4>{product.name}</h4>
-                    <p>Price: Rs. {product.price}</p>
+                    <p>
+                      Price: Rs. {discountedPrice}
+                      {discountPercent > 0 ? ` (MRP Rs. ${basePrice}, ${discountPercent}% off)` : ''}
+                    </p>
                     <p>Stock: {product.stock}</p>
                     <p>Category: {product.category}</p>
                     {product.variants && product.variants.length > 0 && (
@@ -897,6 +1001,9 @@ function SellerPanel({ token, onProductAdded }) {
                       </div>
                     )}
                     <div className="seller-actions">
+                      <button type="button" onClick={() => editProduct(product)} disabled={actionLoadingId === product._id}>
+                        Edit
+                      </button>
                       <button type="button" onClick={() => changeStock(product, 1)} disabled={actionLoadingId === product._id}>
                         + Stock
                       </button>
@@ -914,7 +1021,8 @@ function SellerPanel({ token, onProductAdded }) {
                       </button>
                     </div>
                   </article>
-                ))}
+                  );
+                })}
               </div>
             ) : null}
           </section>

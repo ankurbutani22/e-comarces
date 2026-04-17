@@ -18,6 +18,12 @@ import DeliveryPanel from './pages/DeliveryPanel';
 import SellerPanel from './pages/SellerPanel';
 import Unauthorized from './pages/Unauthorized';
 
+const getEffectiveProductPrice = (product) => {
+  const basePrice = Number(product?.price || 0);
+  const discountPercent = Math.min(95, Math.max(0, Number(product?.discountPercent || 0)));
+  return Math.max(0, Math.round(basePrice - (basePrice * discountPercent) / 100));
+};
+
 function App() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -60,9 +66,9 @@ function App() {
     }
 
     if (sortBy === 'price-low') {
-      nextProducts.sort((left, right) => Number(left?.price || 0) - Number(right?.price || 0));
+      nextProducts.sort((left, right) => getEffectiveProductPrice(left) - getEffectiveProductPrice(right));
     } else if (sortBy === 'price-high') {
-      nextProducts.sort((left, right) => Number(right?.price || 0) - Number(left?.price || 0));
+      nextProducts.sort((left, right) => getEffectiveProductPrice(right) - getEffectiveProductPrice(left));
     }
 
     return nextProducts;

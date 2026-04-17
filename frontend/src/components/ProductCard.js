@@ -36,6 +36,9 @@ const getBestCardImage = (product) => {
 
 function ProductCard({ product }) {
   const productImage = getBestCardImage(product);
+  const basePrice = Number(product?.price || 0);
+  const discountPercent = Math.min(95, Math.max(0, Number(product?.discountPercent || 0)));
+  const discountedPrice = Math.max(0, Math.round(basePrice - (basePrice * discountPercent) / 100));
 
   return (
     <div className="product-card">
@@ -51,7 +54,16 @@ function ProductCard({ product }) {
         />
         <div className="product-info">
           <h3 className="product-name">{product.name}</h3>
-          <p className="product-price">₹{product.price}</p>
+          <p className="product-price">
+            ₹{discountedPrice}
+            {discountPercent > 0 ? (
+              <>
+                {' '}
+                <span style={{ textDecoration: 'line-through', opacity: 0.65, marginLeft: '0.4rem' }}>₹{basePrice}</span>
+                <span style={{ marginLeft: '0.4rem', color: '#0f766e', fontWeight: 700 }}>-{discountPercent}%</span>
+              </>
+            ) : null}
+          </p>
           <p className="product-stock">
             {product.stock > 0 ? `In Stock: ${product.stock}` : 'Out of Stock'}
           </p>
