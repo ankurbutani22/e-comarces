@@ -69,19 +69,27 @@ function ProductList({
       .slice(0, 20);
   }, [ads]);
 
+  const groupedSlides = useMemo(() => {
+    const groups = [];
+    for (let index = 0; index < carouselSlides.length; index += 4) {
+      groups.push(carouselSlides.slice(index, index + 4));
+    }
+    return groups;
+  }, [carouselSlides]);
+
   useEffect(() => {
     setActiveSlide(0);
-  }, [carouselSlides.length]);
+  }, [groupedSlides.length]);
 
   useEffect(() => {
-    if (carouselSlides.length <= 1) return undefined;
+    if (groupedSlides.length <= 1) return undefined;
 
     const timer = window.setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % carouselSlides.length);
+      setActiveSlide((prev) => (prev + 1) % groupedSlides.length);
     }, 4200);
 
     return () => window.clearInterval(timer);
-  }, [carouselSlides.length]);
+  }, [groupedSlides.length]);
 
   if (loading) {
     return <div className="loading">Loading products...</div>;
@@ -98,19 +106,23 @@ function ProductList({
 
   return (
     <div className="storefront-shell">
-      {carouselSlides.length > 0 ? (
-        <section className="home-carousel home-image-carousel" aria-label="Featured ads showcase">
-          <div className="home-carousel-track" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
-            {carouselSlides.map((slide, index) => (
-              <article className="home-carousel-slide" key={`${slide.image}-${index}`}>
-                <img src={slide.image} alt="Ad banner" className="home-carousel-image" />
-              </article>
+      {groupedSlides.length > 0 ? (
+        <section className="home-ad-grid-carousel" aria-label="Featured ads showcase">
+          <div className="home-ad-grid-track" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
+            {groupedSlides.map((slideGroup, groupIndex) => (
+              <div className="home-ad-grid-page" key={`group-${groupIndex}`}>
+                {slideGroup.map((slide, itemIndex) => (
+                  <article className="home-ad-grid-item" key={`${slide.image}-${groupIndex}-${itemIndex}`}>
+                    <img src={slide.image} alt="Ad banner" className="home-ad-grid-image" />
+                  </article>
+                ))}
+              </div>
             ))}
           </div>
 
-          {carouselSlides.length > 1 ? (
+          {groupedSlides.length > 1 ? (
             <div className="home-carousel-dots">
-              {carouselSlides.map((_, index) => (
+              {groupedSlides.map((_, index) => (
                 <button
                   key={`dot-${index}`}
                   type="button"
