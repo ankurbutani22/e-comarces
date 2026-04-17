@@ -22,7 +22,7 @@ function AdminPanel({ token }) {
   const [orders, setOrders] = useState([]);
   const [ads, setAds] = useState([]);
   const [selectedRoles, setSelectedRoles] = useState({});
-  const [activeSection, setActiveSection] = useState('dashboard');
+  const [activeSection, setActiveSection] = useState('home');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -39,12 +39,11 @@ function AdminPanel({ token }) {
 
   const roleOptions = ['user', 'seller', 'delivery_boy', 'admin'];
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'features', label: 'Features' },
+    { id: 'home', label: 'Home' },
+    { id: 'ads', label: 'Ads' },
     { id: 'users', label: 'Users' },
     { id: 'products', label: 'Products' },
-    { id: 'orders', label: 'Orders' },
-    { id: 'ads', label: 'Ads' }
+    { id: 'orders', label: 'Orders' }
   ];
 
   const loadAdminData = async () => {
@@ -237,7 +236,7 @@ function AdminPanel({ token }) {
         </div>
       </section>
 
-      {activeSection === 'dashboard' ? (
+      {activeSection === 'home' ? (
       <section className="panel-page">
         <h3>Dashboard Summary</h3>
         <div className="admin-feature-grid">
@@ -253,20 +252,6 @@ function AdminPanel({ token }) {
             <span className="admin-feature-dot" />
             <p>Total Orders: {dashboard.stats?.orders || 0}</p>
           </article>
-        </div>
-      </section>
-      ) : null}
-
-      {activeSection === 'features' ? (
-      <section className="admin-features panel-page">
-        <h3>Access & Features</h3>
-        <div className="admin-feature-grid">
-          {panelData.features.map((feature) => (
-            <article key={feature} className="admin-feature-card">
-              <span className="admin-feature-dot" />
-              <p>{feature}</p>
-            </article>
-          ))}
         </div>
       </section>
       ) : null}

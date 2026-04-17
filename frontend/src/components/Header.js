@@ -8,9 +8,10 @@ const PROFILE_PLACEHOLDER =
 function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const canUseCart = user && (user.role === 'user' || user.role === 'admin');
+  const isAdmin = user?.role === 'admin';
+  const canUseCart = user && user.role === 'user';
   const canSeeOrders = user && user.role === 'user';
-  const canUseScanner = user && (user.role === 'seller' || user.role === 'admin' || user.role === 'delivery_boy');
+  const canUseScanner = user && (user.role === 'seller' || user.role === 'delivery_boy');
   const canUseDeliveryPanel = user && user.role === 'delivery_boy';
   const profileImageSrc = user?.profileImage || user?.avatar || user?.image || PROFILE_PLACEHOLDER;
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -80,15 +81,19 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
   };
 
   const showSearch = location.pathname === '/';
-  const navItems = [
-    { to: '/', label: 'Home' },
-    ...(canUseCart ? [{ to: '/cart', label: 'Cart' }] : []),
-    ...(canSeeOrders ? [{ to: '/orders', label: 'My Orders' }] : []),
-    ...(canUseScanner ? [{ to: '/seller/scan', label: 'QR Scanner' }] : []),
-    ...(canUseDeliveryPanel ? [{ to: '/delivery', label: 'Delivery Panel' }] : []),
-    ...(user?.role === 'admin' ? [{ to: '/admin', label: 'Admin Panel' }] : []),
-    ...(user?.role === 'seller' ? [{ to: '/seller', label: 'Seller Panel' }] : [])
-  ];
+  const navItems = isAdmin
+    ? [
+        { to: '/', label: 'Home' },
+        { to: '/admin', label: 'Admin Panel' }
+      ]
+    : [
+        { to: '/', label: 'Home' },
+        ...(canUseCart ? [{ to: '/cart', label: 'Cart' }] : []),
+        ...(canSeeOrders ? [{ to: '/orders', label: 'My Orders' }] : []),
+        ...(canUseScanner ? [{ to: '/seller/scan', label: 'QR Scanner' }] : []),
+        ...(canUseDeliveryPanel ? [{ to: '/delivery', label: 'Delivery Panel' }] : []),
+        ...(user?.role === 'seller' ? [{ to: '/seller', label: 'Seller Panel' }] : [])
+      ];
 
   return (
     <header className="app-header">
