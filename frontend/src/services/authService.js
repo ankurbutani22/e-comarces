@@ -37,6 +37,60 @@ export const getAdminPanel = async (token) => {
   return response.data;
 };
 
+export const getAdminDashboard = async (token) => {
+  const response = await axios.get('/api/panel/admin/dashboard', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+export const getAdminUsers = async (token) => {
+  const response = await axios.get('/api/panel/admin/users', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+export const updateAdminUserRole = async (token, userId, role) => {
+  const response = await axios.patch(`/api/panel/admin/users/${userId}/role`, { role }, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+export const deleteAdminUser = async (token, userId) => {
+  const response = await axios.delete(`/api/panel/admin/users/${userId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+export const getAdminProducts = async (token) => {
+  const response = await axios.get('/api/panel/admin/products', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+export const getAdminOrders = async (token) => {
+  const response = await axios.get('/api/panel/admin/orders', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
 export const getSellerPanel = async (token) => {
   const response = await axios.get('/api/panel/seller', {
     headers: {

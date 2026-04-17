@@ -4,9 +4,64 @@ const http = require('http');
 const path = require('path');
 require('dotenv').config();
 const connectDB = require('./config/database');
+const User = require('./models/User');
 
-// Connect to MongoDB
-connectDB();
+const ensureDefaultAdmin = async () => {
+  try {
+    const adminEmail = (process.env.DEFAULT_ADMIN_EMAIL || 'admin22@gmail.com').toLowerCase();
+    const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'admin2209';
+    const adminName = process.env.DEFAULT_ADMIN_NAME || 'System Admin';
+
+    const existingAdmin = await User.findOne({ email: adminEmail }).select('+password');
+
+    if (!existingAdmin) {
+      await User.create({
+        name: adminName,
+        email: adminEmail,
+        password: adminPassword,
+        role: 'admin'
+      });
+      console.log(`Default admin created: ${adminEmail}`);
+      return;
+    }
+
+    let shouldSave = false;
+
+    if (existingAdmin.role !== 'admin') {
+      existingAdmin.role = 'admin';
+      shouldSave = true;
+    }
+
+    if (existingAdmin.name !== adminName) {
+      existingAdmin.name = adminName;
+      shouldSave = true;
+    }
+
+    const matchesPassword = await existingAdmin.comparePassword(adminPassword);
+    if (!matchesPassword) {
+      existingAdmin.password = adminPassword;
+      shouldSave = true;
+    }
+
+    if (shouldSave) {
+      await existingAdmin.save();
+      console.log(`Default admin updated: ${adminEmail}`);
+    }
+  } catch (error) {
+    console.error('Failed to ensure default admin account:', error.message);
+  }
+};
+
+initializeDatabase();
+
+async function initializeDatabase() {
+  try {
+    await connectDB();
+    await ensureDefaultAdmin();
+  } catch (error) {
+    console.error('Database bootstrap failed:', error.message);
+  }
+}
 
 const app = express();
 
