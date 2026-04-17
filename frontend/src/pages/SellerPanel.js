@@ -26,6 +26,8 @@ function SellerPanel({ token, onProductAdded }) {
   const [variantImageFiles, setVariantImageFiles] = useState({});
   const [sizes, setSizes] = useState([]);
   const [sizeInput, setSizeInput] = useState('');
+  const [ramSizes, setRamSizes] = useState([]);
+  const [ramSizeInput, setRamSizeInput] = useState('');
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -68,9 +70,22 @@ function SellerPanel({ token, onProductAdded }) {
   }), [form.images, form.video, myProducts.length, sellerOrders.length]);
 
   const onChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === 'category') {
+      if (value !== 'Clothing') {
+        setSizes([]);
+        setSizeInput('');
+      }
+      if (value !== 'Mobile') {
+        setRamSizes([]);
+        setRamSizeInput('');
+      }
+    }
+
     setForm({
       ...form,
-      [e.target.name]: e.target.value
+      [name]: value
     });
   };
 
@@ -118,6 +133,18 @@ function SellerPanel({ token, onProductAdded }) {
 
   const removeSize = (sizeToRemove) => {
     setSizes(sizes.filter(s => s !== sizeToRemove));
+  };
+
+  const addRamSize = () => {
+    const normalizedValue = ramSizeInput.trim().toUpperCase();
+    if (normalizedValue && !ramSizes.includes(normalizedValue)) {
+      setRamSizes([...ramSizes, normalizedValue]);
+      setRamSizeInput('');
+    }
+  };
+
+  const removeRamSize = (ramToRemove) => {
+    setRamSizes(ramSizes.filter(ram => ram !== ramToRemove));
   };
 
   const refreshProducts = async () => {
@@ -175,7 +202,8 @@ function SellerPanel({ token, onProductAdded }) {
           name: v.name,
           images: v.images || []
         })) || undefined,
-        sizes: form.category === 'Clothing' ? sizes : undefined
+        sizes: form.category === 'Clothing' ? sizes : undefined,
+        ramSizes: form.category === 'Mobile' ? ramSizes : undefined
       });
 
       await refreshProducts();
@@ -196,6 +224,8 @@ function SellerPanel({ token, onProductAdded }) {
       setVariants([]);
       setSizes([]);
       setSizeInput('');
+      setRamSizes([]);
+      setRamSizeInput('');
       setVariantImageFiles({});
       resetMediaSelection();
     } catch (err) {
@@ -513,6 +543,7 @@ function SellerPanel({ token, onProductAdded }) {
                 <select name="category" value={form.category} onChange={onChange}>
                   <option value="Electronics">Electronics</option>
                   <option value="Clothing">Clothing</option>
+                  <option value="Mobile">Mobile</option>
                   <option value="Books">Books</option>
                   <option value="Home">Home</option>
                   <option value="Sports">Sports</option>
@@ -540,6 +571,32 @@ function SellerPanel({ token, onProductAdded }) {
                       <span key={size} className="size-chip">
                         {size}
                         <button type="button" onClick={() => removeSize(size)}>×</button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {form.category === 'Mobile' && (
+                <div className="field-span-2 sizes-section">
+                  <label>RAM Sizes</label>
+                  <div className="size-input-group">
+                    <input
+                      type="text"
+                      placeholder="e.g., 4GB, 6GB, 8GB, 12GB"
+                      value={ramSizeInput}
+                      onChange={(e) => setRamSizeInput(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addRamSize())}
+                    />
+                    <button type="button" className="ghost-btn" onClick={addRamSize}>
+                      Add RAM
+                    </button>
+                  </div>
+                  <div className="size-chips">
+                    {ramSizes.map((ram) => (
+                      <span key={ram} className="size-chip">
+                        {ram}
+                        <button type="button" onClick={() => removeRamSize(ram)}>×</button>
                       </span>
                     ))}
                   </div>
@@ -706,6 +763,11 @@ function SellerPanel({ token, onProductAdded }) {
                     {product.sizes && product.sizes.length > 0 && (
                       <div className="product-sizes-badge">
                         <span className="badge">Sizes: {product.sizes.join(', ')}</span>
+                      </div>
+                    )}
+                    {product.ramSizes && product.ramSizes.length > 0 && (
+                      <div className="product-sizes-badge">
+                        <span className="badge">RAM: {product.ramSizes.join(', ')}</span>
                       </div>
                     )}
                     <div className="seller-actions">

@@ -3,6 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { createOrder, getMyOrders, getProfile } from '../services/authService';
 import { readLocalJson } from '../utils/storage';
 
+const ORDER_ITEM_PLACEHOLDER =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><rect width="96" height="96" rx="12" fill="%23e5e7eb"/><rect x="20" y="22" width="56" height="50" rx="8" fill="%23ffffff" stroke="%23cbd5e1"/><circle cx="38" cy="42" r="6" fill="%2394a3b8"/><path d="M28 63l12-12 10 10 8-8 10 10" stroke="%2394a3b8" stroke-width="4" fill="none" stroke-linecap="round"/></svg>';
+
+const resolveMediaUrl = (value) => {
+  if (!value || typeof value !== 'string') return '';
+  if (/^https?:\/\//i.test(value)) return value;
+
+  const normalizedPath = value.startsWith('/') ? value : `/${value}`;
+  if (normalizedPath.startsWith('/uploads/')) {
+    const backendOrigin = process.env.REACT_APP_API_ORIGIN || 'http://localhost:2205';
+    return `${backendOrigin}${normalizedPath}`;
+  }
+
+  return normalizedPath;
+};
+
 function Cart() {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
@@ -106,12 +122,31 @@ function Cart() {
     return 0;
   };
 
+  const getTrackingLabel = (status) => {
+    if (status === 'processing') return 'Packed & Ready';
+    if (status === 'shipped') return 'Reached City';
+    if (status === 'delivered') return 'Delivered';
+    return 'Order Placed';
+  };
+
+  const formatTrackingTime = (value) => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleString();
+  };
+
   const printOrderBill = (order) => {
     const itemsHtml = order.items
       .map(
         (item) => `
           <tr>
-            <td style="padding:8px;border:1px solid #ddd;">${item.productName}</td>
+            <td style="padding:8px;border:1px solid #ddd;">
+              ${item.productName}
+              ${item.selectedVariantName ? `<div style="font-size:12px;color:#555;">Design: ${item.selectedVariantName}</div>` : ''}
+              ${item.selectedSize ? `<div style="font-size:12px;color:#555;">Size: ${item.selectedSize}</div>` : ''}
+              ${item.selectedRamSize ? `<div style="font-size:12px;color:#555;">RAM: ${item.selectedRamSize}</div>` : ''}
+            </td>
             <td style="padding:8px;border:1px solid #ddd;text-align:center;">${item.quantity}</td>
             <td style="padding:8px;border:1px solid #ddd;text-align:right;">Rs. ${item.price}</td>
             <td style="padding:8px;border:1px solid #ddd;text-align:right;">Rs. ${item.quantity * item.price}</td>
@@ -231,7 +266,12 @@ function Cart() {
         paymentMethod,
         items: cartItems.map((item) => ({
           product: item._id,
-          quantity: item.quantity
+          quantity: item.quantity,
+          selectedSize: item.selectedSize || '',
+          selectedRamSize: item.selectedRamSize || '',
+          selectedVariantId: item.selectedVariantId || '',
+          selectedVariantName: item.selectedVariantName || '',
+          selectedVariantImage: item.selectedVariantImage || ''
         }))
       };
 
@@ -279,6 +319,7 @@ function Cart() {
                   <td>
                     <p className="cart-item-name">{item.name}</p>
                     {item.selectedSize ? <p className="cart-item-meta">Size: {item.selectedSize}</p> : null}
+                    {item.selectedRamSize ? <p className="cart-item-meta">RAM: {item.selectedRamSize}</p> : null}
                     {item.selectedVariantName ? <p className="cart-item-meta">Design: {item.selectedVariantName}</p> : null}
                   </td>
                   <td className="cart-center">₹{item.price}</td>
@@ -430,6 +471,10 @@ function Cart() {
                 <p className="cart-order-total">Total: Rs. {order.totalAmount}</p>
 
                 <div className="tracking-card compact">
+                  <div className="tracking-head">
+                    <span className="section-kicker">Tracking</span>
+                    <strong>{getTrackingLabel(order.status)}</strong>
+                  </div>
                   <div className="tracking-steps">
                     {['Order Placed', 'Packed', 'Reached City', 'Delivered'].map((step, index) => {
                       const active = index <= getTrackingStepIndex(order.status);
@@ -440,13 +485,41 @@ function Cart() {
                       );
                     })}
                   </div>
+                  {Array.isArray(order.trackingEvents) && order.trackingEvents.length > 0 ? (
+                    <div className="tracking-event-list">
+                      {order.trackingEvents.slice().reverse().map((event, idx) => (
+                        <div key={`${order._id}-${event.status}-${idx}`} className="tracking-event-item">
+                          <p>{event.note || event.status}</p>
+                          <span>{formatTrackingTime(event.updatedAt)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
 
-                <div>
+                <div className="order-items-wrap">
                   {order.items.map((item) => (
-                    <p key={`${order._id}-${item.product}-${item.productName}`}>
-                      {item.productName} x {item.quantity}
-                    </p>
+                    <div
+                      key={`${order._id}-${item.product}-${item.productName}`}
+                      className="order-item-row"
+                    >
+                      <img
+                        src={resolveMediaUrl(item.selectedVariantImage || item.productImage) || ORDER_ITEM_PLACEHOLDER}
+                        alt={item.productName}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = ORDER_ITEM_PLACEHOLDER;
+                        }}
+                        className="order-item-thumb"
+                      />
+                      <div>
+                        <p className="order-item-name">{item.productName}</p>
+                        <p className="order-item-qty">Qty: {item.quantity}</p>
+                        {item.selectedVariantName ? <p className="order-item-qty">Design: {item.selectedVariantName}</p> : null}
+                        {item.selectedSize ? <p className="order-item-qty">Size: {item.selectedSize}</p> : null}
+                        {item.selectedRamSize ? <p className="order-item-qty">RAM: {item.selectedRamSize}</p> : null}
+                      </div>
+                    </div>
                   ))}
                 </div>
                 <button type="button" onClick={() => printOrderBill(order)}>

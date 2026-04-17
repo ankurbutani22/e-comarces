@@ -126,6 +126,11 @@ const appendTrackingEvent = (order, { status, note, updatedByRole }) => {
   });
 };
 
+const normalizeTextValue = (value) => {
+  if (value === null || value === undefined) return '';
+  return String(value).trim();
+};
+
 exports.createOrder = async (req, res) => {
   try {
     const { items, shippingAddress, customerName, customerPhone, paymentMethod } = req.body;
@@ -196,14 +201,83 @@ exports.createOrder = async (req, res) => {
         });
       }
 
+      const selectedSize = normalizeTextValue(item.selectedSize);
+      const selectedRamSize = normalizeTextValue(item.selectedRamSize);
+      const selectedVariantIdInput = normalizeTextValue(item.selectedVariantId);
+      const selectedVariantNameInput = normalizeTextValue(item.selectedVariantName);
+
+      const availableSizes = Array.isArray(matched.sizes) ? matched.sizes : [];
+      if (availableSizes.length > 0 && !selectedSize) {
+        return res.status(400).json({
+          success: false,
+          message: `Please select size for ${matched.name}`
+        });
+      }
+      if (selectedSize && availableSizes.length > 0 && !availableSizes.includes(selectedSize)) {
+        return res.status(400).json({
+          success: false,
+          message: `Selected size is invalid for ${matched.name}`
+        });
+      }
+
+      const availableRamSizes = Array.isArray(matched.ramSizes) ? matched.ramSizes : [];
+      if (availableRamSizes.length > 0 && !selectedRamSize) {
+        return res.status(400).json({
+          success: false,
+          message: `Please select RAM size for ${matched.name}`
+        });
+      }
+      if (selectedRamSize && availableRamSizes.length > 0 && !availableRamSizes.includes(selectedRamSize)) {
+        return res.status(400).json({
+          success: false,
+          message: `Selected RAM size is invalid for ${matched.name}`
+        });
+      }
+
+      const availableVariants = Array.isArray(matched.variants) ? matched.variants : [];
+      let selectedVariant = null;
+
+      if (availableVariants.length > 0) {
+        selectedVariant = availableVariants.find(
+          (variant) => String(variant._id || variant.id) === selectedVariantIdInput
+        );
+
+        if (!selectedVariant && selectedVariantNameInput) {
+          selectedVariant = availableVariants.find((variant) =>
+            String(variant.name || '').toLowerCase() === selectedVariantNameInput.toLowerCase()
+          );
+        }
+
+        if (!selectedVariant) {
+          return res.status(400).json({
+            success: false,
+            message: `Please select design for ${matched.name}`
+          });
+        }
+      }
+
       const linePrice = Number(matched.price);
       totalAmount += linePrice * quantity;
+
+      const selectedVariantImage =
+        normalizeTextValue(item.selectedVariantImage) ||
+        (Array.isArray(selectedVariant?.images) && selectedVariant.images.length > 0 ? selectedVariant.images[0] : '');
+
+      const productImage =
+        selectedVariantImage ||
+        matched.image ||
+        (Array.isArray(matched.images) && matched.images.length > 0 ? matched.images[0] : '');
 
       normalizedItems.push({
         product: matched._id,
         seller: matched.seller,
         productName: matched.name,
-        productImage: matched.image || (Array.isArray(matched.images) && matched.images.length > 0 ? matched.images[0] : ''),
+        productImage,
+        selectedSize,
+        selectedRamSize,
+        selectedVariantId: selectedVariant ? String(selectedVariant._id || selectedVariant.id) : '',
+        selectedVariantName: selectedVariant ? String(selectedVariant.name || '') : '',
+        selectedVariantImage,
         quantity,
         price: linePrice
       });

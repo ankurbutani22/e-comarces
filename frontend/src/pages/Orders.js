@@ -85,7 +85,12 @@ function Orders({ token }) {
       .map(
         (item) => `
           <tr>
-            <td style="padding:8px;border:1px solid #ddd;">${item.productName}</td>
+            <td style="padding:8px;border:1px solid #ddd;">
+              ${item.productName}
+              ${item.selectedVariantName ? `<div style="font-size:12px;color:#555;">Design: ${item.selectedVariantName}</div>` : ''}
+              ${item.selectedSize ? `<div style="font-size:12px;color:#555;">Size: ${item.selectedSize}</div>` : ''}
+              ${item.selectedRamSize ? `<div style="font-size:12px;color:#555;">RAM: ${item.selectedRamSize}</div>` : ''}
+            </td>
             <td style="padding:8px;border:1px solid #ddd;text-align:center;">${item.quantity}</td>
             <td style="padding:8px;border:1px solid #ddd;text-align:right;">Rs. ${item.price}</td>
             <td style="padding:8px;border:1px solid #ddd;text-align:right;">Rs. ${item.quantity * item.price}</td>
@@ -220,7 +225,7 @@ function Orders({ token }) {
                   className="order-item-row"
                 >
                   <img
-                    src={resolveMediaUrl(item.productImage) || ORDER_ITEM_PLACEHOLDER}
+                    src={resolveMediaUrl(item.selectedVariantImage || item.productImage) || ORDER_ITEM_PLACEHOLDER}
                     alt={item.productName}
                     onError={(e) => {
                       e.currentTarget.onerror = null;
@@ -231,6 +236,9 @@ function Orders({ token }) {
                   <div>
                     <p className="order-item-name">{item.productName}</p>
                     <p className="order-item-qty">Qty: {item.quantity}</p>
+                    {item.selectedVariantName ? <p className="order-item-qty">Design: {item.selectedVariantName}</p> : null}
+                    {item.selectedSize ? <p className="order-item-qty">Size: {item.selectedSize}</p> : null}
+                    {item.selectedRamSize ? <p className="order-item-qty">RAM: {item.selectedRamSize}</p> : null}
                   </div>
                 </div>
               ))}

@@ -27,6 +27,26 @@ const orderSchema = new mongoose.Schema(
           type: String,
           default: ''
         },
+        selectedSize: {
+          type: String,
+          default: ''
+        },
+        selectedRamSize: {
+          type: String,
+          default: ''
+        },
+        selectedVariantId: {
+          type: String,
+          default: ''
+        },
+        selectedVariantName: {
+          type: String,
+          default: ''
+        },
+        selectedVariantImage: {
+          type: String,
+          default: ''
+        },
         quantity: {
           type: Number,
           required: true,

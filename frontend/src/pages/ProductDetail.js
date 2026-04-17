@@ -33,6 +33,7 @@ function ProductDetail() {
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
+  const [selectedRamSize, setSelectedRamSize] = useState('');
   const [selectedVariantId, setSelectedVariantId] = useState('');
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [placingOrder, setPlacingOrder] = useState(false);
@@ -61,6 +62,11 @@ function ProductDetail() {
       return;
     }
 
+    if (Array.isArray(product.ramSizes) && product.ramSizes.length > 0 && !selectedRamSize) {
+      alert('Please select RAM size first.');
+      return;
+    }
+
     if (Array.isArray(product.variants) && product.variants.length > 0 && !selectedVariantId) {
       alert('Please select design first.');
       return;
@@ -70,7 +76,11 @@ function ProductDetail() {
       (variant) => String(variant._id || variant.id) === String(selectedVariantId)
     );
 
-    const cartKey = `${product._id}__${selectedSize || 'nosize'}__${selectedVariant?.name || 'nodefault'}`;
+    const selectedVariantImage = Array.isArray(selectedVariant?.images) && selectedVariant.images.length > 0
+      ? selectedVariant.images[0]
+      : '';
+
+    const cartKey = `${product._id}__${selectedSize || 'nosize'}__${selectedRamSize || 'noram'}__${selectedVariant?.name || 'nodefault'}`;
 
     const cart = readLocalJson('cart', []);
     const existing = cart.find((item) => item.cartKey === cartKey);
@@ -83,8 +93,10 @@ function ProductDetail() {
         quantity: 1,
         cartKey,
         selectedSize: selectedSize || '',
+        selectedRamSize: selectedRamSize || '',
         selectedVariantId: selectedVariant ? String(selectedVariant._id || selectedVariant.id) : '',
-        selectedVariantName: selectedVariant?.name || ''
+        selectedVariantName: selectedVariant?.name || '',
+        selectedVariantImage
       });
     }
 
@@ -100,6 +112,11 @@ function ProductDetail() {
 
     if (Array.isArray(product.sizes) && product.sizes.length > 0 && !selectedSize) {
       alert('Please select size first.');
+      return false;
+    }
+
+    if (Array.isArray(product.ramSizes) && product.ramSizes.length > 0 && !selectedRamSize) {
+      alert('Please select RAM size first.');
       return false;
     }
 
@@ -194,7 +211,15 @@ function ProductDetail() {
         items: [
           {
             product: product._id,
-            quantity: 1
+            quantity: 1,
+            selectedSize: selectedSize || '',
+            selectedRamSize: selectedRamSize || '',
+            selectedVariantId: selectedVariant ? String(selectedVariant._id || selectedVariant.id) : '',
+            selectedVariantName: selectedVariant?.name || '',
+            selectedVariantImage:
+              Array.isArray(selectedVariant?.images) && selectedVariant.images.length > 0
+                ? selectedVariant.images[0]
+                : ''
           }
         ]
       });
@@ -257,6 +282,11 @@ function ProductDetail() {
     [product]
   );
 
+  const ramSizeOptions = useMemo(
+    () => (Array.isArray(product?.ramSizes) ? product.ramSizes : []),
+    [product]
+  );
+
   const selectedVariant = useMemo(
     () => variantOptions.find((variant) => String(variant._id || variant.id) === String(selectedVariantId)) || null,
     [variantOptions, selectedVariantId]
@@ -264,6 +294,7 @@ function ProductDetail() {
 
   useEffect(() => {
     setSelectedSize('');
+    setSelectedRamSize('');
     if (variantOptions.length === 1) {
       setSelectedVariantId(String(variantOptions[0]._id || variantOptions[0].id));
     } else {
@@ -367,6 +398,24 @@ function ProductDetail() {
                     onClick={() => setSelectedSize(size)}
                   >
                     {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {ramSizeOptions.length > 0 ? (
+            <div className="selection-block">
+              <p className="selector-label">Select RAM</p>
+              <div className="chip-row">
+                {ramSizeOptions.map((ramSize) => (
+                  <button
+                    key={ramSize}
+                    type="button"
+                    className={`option-chip ${selectedRamSize === ramSize ? 'active' : ''}`}
+                    onClick={() => setSelectedRamSize(ramSize)}
+                  >
+                    {ramSize}
                   </button>
                 ))}
               </div>
