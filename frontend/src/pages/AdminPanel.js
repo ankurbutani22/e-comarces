@@ -30,8 +30,9 @@ function AdminPanel({ token }) {
   const [adImageFile, setAdImageFile] = useState(null);
   const [adForm, setAdForm] = useState({
     image: '',
-    title: '',
-    subtitle: '',
+    companyName: '',
+    productName: '',
+    content: '',
     sortOrder: 0,
     isActive: true
   });
@@ -149,16 +150,20 @@ function AdminPanel({ token }) {
 
       await createAdminAd(token, {
         image: imageUrl,
-        title: adForm.title,
-        subtitle: adForm.subtitle,
+        title: adForm.productName || adForm.companyName || 'Featured Offer',
+        subtitle: adForm.content,
+        companyName: adForm.companyName,
+        productName: adForm.productName,
+        content: adForm.content,
         sortOrder: Number(adForm.sortOrder || 0),
         isActive: Boolean(adForm.isActive)
       });
 
       setAdForm({
         image: '',
-        title: '',
-        subtitle: '',
+        companyName: '',
+        productName: '',
+        content: '',
         sortOrder: 0,
         isActive: true
       });
@@ -378,17 +383,24 @@ function AdminPanel({ token }) {
         <div style={{ display: 'grid', gap: '0.75rem', marginBottom: '1rem' }}>
           <input
             type="text"
-            name="title"
-            placeholder="Ad title"
-            value={adForm.title}
+            name="companyName"
+            placeholder="Company name"
+            value={adForm.companyName}
             onChange={onAdFormChange}
           />
           <input
             type="text"
-            name="subtitle"
-            placeholder="Ad subtitle"
-            value={adForm.subtitle}
+            name="productName"
+            placeholder="Product name"
+            value={adForm.productName}
             onChange={onAdFormChange}
+          />
+          <textarea
+            name="content"
+            placeholder="Ad content"
+            value={adForm.content}
+            onChange={onAdFormChange}
+            rows={3}
           />
           <input
             type="text"
@@ -430,8 +442,9 @@ function AdminPanel({ token }) {
             <thead>
               <tr>
                 <th>Image</th>
-                <th>Title</th>
-                <th>Subtitle</th>
+                <th>Company</th>
+                <th>Product</th>
+                <th>Content</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -447,7 +460,9 @@ function AdminPanel({ token }) {
                     />
                   </td>
                   <td>{ad.title || '-'}</td>
-                  <td>{ad.subtitle || '-'}</td>
+                  <td>{ad.companyName || '-'}</td>
+                  <td>{ad.productName || ad.title || '-'}</td>
+                  <td>{ad.content || ad.subtitle || '-'}</td>
                   <td>{ad.isActive ? 'Active' : 'Inactive'}</td>
                   <td>
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>

@@ -67,6 +67,9 @@ function ProductList({
     };
 
     loadAds();
+    const poller = window.setInterval(loadAds, 15000);
+
+    return () => window.clearInterval(poller);
   }, []);
 
   const carouselSlides = useMemo(() => {
@@ -74,8 +77,9 @@ function ProductList({
       .filter((ad) => ad?.image)
       .map((ad) => ({
         image: resolveMediaUrl(ad.image),
-        title: ad.title || 'Featured Offer',
-        subtitle: ad.subtitle || 'Latest updates from admin'
+        title: ad.productName || ad.title || 'Featured Offer',
+        subtitle: ad.content || ad.subtitle || 'Latest updates from admin',
+        companyName: ad.companyName || ''
       }))
       .filter((ad) => ad.image)
       .slice(0, 8);
@@ -157,7 +161,7 @@ function ProductList({
             <article className="home-carousel-slide" key={`${slide.image}-${index}`}>
               <img src={slide.image} alt={slide.title} className="home-carousel-image" />
               <div className="home-carousel-overlay">
-                <p className="home-carousel-kicker">Featured</p>
+                <p className="home-carousel-kicker">{slide.companyName || 'Featured'}</p>
                 <h3>{slide.title}</h3>
                 <p>{slide.subtitle}</p>
               </div>

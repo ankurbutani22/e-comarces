@@ -234,7 +234,7 @@ exports.getAdminAds = async (req, res) => {
 
 exports.createAdminAd = async (req, res) => {
   try {
-    const { image, title, subtitle, sortOrder, isActive } = req.body;
+    const { image, title, subtitle, content, companyName, productName, sortOrder, isActive } = req.body;
 
     if (!image || !String(image).trim()) {
       return res.status(400).json({
@@ -245,6 +245,9 @@ exports.createAdminAd = async (req, res) => {
 
     const ad = await Ad.create({
       image: String(image).trim(),
+      companyName: String(companyName || '').trim(),
+      productName: String(productName || '').trim(),
+      content: String(content || '').trim(),
       title: String(title || 'Featured Offer').trim(),
       subtitle: String(subtitle || '').trim(),
       sortOrder: Number.isFinite(Number(sortOrder)) ? Number(sortOrder) : 0,
@@ -279,6 +282,18 @@ exports.updateAdminAd = async (req, res) => {
 
     if (typeof req.body.subtitle === 'string') {
       updatePayload.subtitle = req.body.subtitle.trim();
+    }
+
+    if (typeof req.body.content === 'string') {
+      updatePayload.content = req.body.content.trim();
+    }
+
+    if (typeof req.body.companyName === 'string') {
+      updatePayload.companyName = req.body.companyName.trim();
+    }
+
+    if (typeof req.body.productName === 'string') {
+      updatePayload.productName = req.body.productName.trim();
     }
 
     if (typeof req.body.sortOrder !== 'undefined') {
