@@ -228,6 +228,9 @@ function App() {
           autoClose={2800}
           pauseOnHover
           newestOnTop
+          limit={4}
+          closeOnClick
+          draggable
           closeButton
           toastClassName="app-toast"
           bodyClassName="app-toast-body"
