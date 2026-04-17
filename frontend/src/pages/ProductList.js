@@ -121,7 +121,10 @@ function ProductList({
   return (
     <div className="storefront-shell">
       {carouselSlides.length > 0 ? (
-        <section className="home-ad-showcase" aria-label="Featured ads showcase">
+        <section
+          className={`home-ad-showcase ${carouselSlides.length > 2 ? 'has-side-ads' : 'single-focus'}`}
+          aria-label="Featured ads showcase"
+        >
           {carouselSlides.length > 2 ? (
             <article className="home-side-ad-card left" aria-hidden="true">
               <img src={leftCardSlide?.image} alt={leftCardSlide?.title || 'Ad'} className="home-side-ad-image" />

@@ -878,6 +878,14 @@ button:hover {
   margin: 0.2rem 0.9rem 1rem;
 }
 
+.home-ad-showcase.single-focus {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.home-ad-showcase.single-focus .home-carousel-main {
+  max-width: 100%;
+}
+
 .home-carousel-main {
   margin: 0;
 }
@@ -906,7 +914,7 @@ button:hover {
 .home-carousel-slide {
   min-width: 100%;
   position: relative;
-  aspect-ratio: 16 / 7;
+  aspect-ratio: 16 / 6.2;
   background: #dbe7f2;
 }
 
