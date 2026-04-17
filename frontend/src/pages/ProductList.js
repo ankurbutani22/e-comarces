@@ -33,6 +33,7 @@ function ProductList({
   const list = useMemo(() => (Array.isArray(products) ? products : []), [products]);
   const [ads, setAds] = useState([]);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [cardsPerSlide, setCardsPerSlide] = useState(() => (window.innerWidth <= 1100 ? 2 : 4));
   const hasActiveFilters = searchQuery.trim() || sortBy !== 'featured';
   const sortOptions = [
     { value: 'featured', label: 'Default' },
@@ -59,6 +60,15 @@ function ProductList({
     return () => window.clearInterval(poller);
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setCardsPerSlide(window.innerWidth <= 1100 ? 2 : 4);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const carouselSlides = useMemo(() => {
     return (Array.isArray(ads) ? ads : [])
       .filter((ad) => ad?.image)
@@ -71,11 +81,11 @@ function ProductList({
 
   const groupedSlides = useMemo(() => {
     const groups = [];
-    for (let index = 0; index < carouselSlides.length; index += 4) {
-      groups.push(carouselSlides.slice(index, index + 4));
+    for (let index = 0; index < carouselSlides.length; index += cardsPerSlide) {
+      groups.push(carouselSlides.slice(index, index + cardsPerSlide));
     }
     return groups;
-  }, [carouselSlides]);
+  }, [carouselSlides, cardsPerSlide]);
 
   useEffect(() => {
     setActiveSlide(0);
