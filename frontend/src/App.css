@@ -1902,7 +1902,67 @@ button:hover {
 .admin-ads-form {
   display: grid;
   gap: 0.75rem;
+}
+
+.admin-ads-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  gap: 0.9rem;
   margin-bottom: 1rem;
+}
+
+.admin-ads-form-card {
+  display: grid;
+  gap: 0.8rem;
+  align-content: start;
+}
+
+.admin-ads-preview-card {
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  padding: 0.7rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.admin-ads-preview-label {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #33516a;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.admin-ads-preview-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #d9e3f1;
+}
+
+.admin-ads-preview-empty {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  border: 1px dashed #b7c8d9;
+  color: #64748b;
+  display: grid;
+  place-items: center;
+  font-size: 0.86rem;
+  background: #f8fbfd;
+}
+
+.admin-ads-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+}
+
+.admin-ads-empty {
+  margin: 0;
+  color: #64748b;
+  font-weight: 600;
 }
 
 .admin-checkbox-row {
@@ -1923,11 +1983,44 @@ button:hover {
 }
 
 .admin-ad-thumb {
-  width: 120px;
-  height: 68px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid #d9e3f1;
+}
+
+.admin-ad-card {
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  padding: 0.6rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  display: grid;
+  gap: 0.55rem;
+}
+
+.admin-ad-card-body {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.admin-ad-status {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.admin-ad-status.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.admin-ad-status.inactive {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 .delivery-shell {
@@ -3187,13 +3280,12 @@ select,
     width: 100%;
   }
 
-  .admin-submit-row button {
-    width: 100%;
+  .admin-ads-layout {
+    grid-template-columns: 1fr;
   }
 
-  .admin-ad-thumb {
-    width: 96px;
-    height: 56px;
+  .admin-submit-row button {
+    width: 100%;
   }
 
   .admin-shell .cart-table-wrap {

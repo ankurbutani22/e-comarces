@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   createAdminAd,
   deleteAdminAd,
@@ -41,6 +41,26 @@ function AdminPanel({ token }) {
     { id: 'products', label: 'Products' },
     { id: 'orders', label: 'Orders' }
   ];
+
+  const adPreviewUrl = useMemo(() => {
+    if (adForm.image && String(adForm.image).trim()) {
+      return String(adForm.image).trim();
+    }
+
+    if (adImageFile) {
+      return URL.createObjectURL(adImageFile);
+    }
+
+    return '';
+  }, [adForm.image, adImageFile]);
+
+  useEffect(() => {
+    return () => {
+      if (adPreviewUrl && adImageFile && adPreviewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(adPreviewUrl);
+      }
+    };
+  }, [adPreviewUrl, adImageFile]);
 
   const loadAdminData = async () => {
     setLoading(true);
@@ -357,69 +377,73 @@ function AdminPanel({ token }) {
       {activeSection === 'ads' ? (
       <section className="panel-page">
         <h3>Ads Management</h3>
-        <div className="admin-ads-form">
-          <input
-            type="text"
-            name="image"
-            placeholder="Ad image URL (optional if uploading file)"
-            value={adForm.image}
-            onChange={onAdFormChange}
-          />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setAdImageFile(e.target.files?.[0] || null)}
-          />
-          <label className="admin-checkbox-row">
-            <input
-              type="checkbox"
-              name="isActive"
-              checked={adForm.isActive}
-              onChange={onAdFormChange}
-            />
-            Active
-          </label>
-          <div className="admin-submit-row">
-            <button type="button" onClick={addAd} disabled={adSubmitting}>
-              {adSubmitting ? 'Saving...' : 'Add Ad'}
-            </button>
-          </div>
-        </div>
+        <div className="admin-ads-layout">
+          <div className="admin-ads-form-card">
+            <div className="admin-ads-form">
+              <input
+                type="text"
+                name="image"
+                placeholder="Ad image URL (optional if uploading file)"
+                value={adForm.image}
+                onChange={onAdFormChange}
+              />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setAdImageFile(e.target.files?.[0] || null)}
+              />
+              <label className="admin-checkbox-row">
+                <input
+                  type="checkbox"
+                  name="isActive"
+                  checked={adForm.isActive}
+                  onChange={onAdFormChange}
+                />
+                Active
+              </label>
+              <div className="admin-submit-row">
+                <button type="button" onClick={addAd} disabled={adSubmitting}>
+                  {adSubmitting ? 'Saving...' : 'Add Ad'}
+                </button>
+              </div>
+            </div>
 
-        <div className="cart-table-wrap">
-          <table className="cart-table">
-            <thead>
-              <tr>
-                <th>Image</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ads.map((ad) => (
-                <tr key={ad._id}>
-                  <td data-label="Image">
-                    <img
-                      src={ad.image}
-                      alt={ad.title || 'Ad'}
-                      className="admin-ad-thumb"
-                    />
-                  </td>
-                  <td data-label="Status">{ad.isActive ? 'Active' : 'Inactive'}</td>
-                  <td data-label="Actions">
-                    <div className="admin-action-row">
-                      <button type="button" onClick={() => toggleAdStatus(ad)}>
-                        {ad.isActive ? 'Deactivate' : 'Activate'}
-                      </button>
-                      <button type="button" className="danger-btn" onClick={() => removeAd(ad._id)}>
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            <div className="admin-ads-preview-card">
+              <p className="admin-ads-preview-label">Preview</p>
+              {adPreviewUrl ? (
+                <img src={adPreviewUrl} alt="Ad preview" className="admin-ads-preview-image" />
+              ) : (
+                <div className="admin-ads-preview-empty">Image preview will appear here</div>
+              )}
+            </div>
+          </div>
+
+          <div className="admin-ads-gallery">
+            {ads.length === 0 ? <p className="admin-ads-empty">No ads added yet.</p> : null}
+
+            {ads.map((ad) => (
+              <article key={ad._id} className="admin-ad-card">
+                <img
+                  src={ad.image}
+                  alt={ad.title || 'Ad'}
+                  className="admin-ad-thumb"
+                />
+                <div className="admin-ad-card-body">
+                  <span className={`admin-ad-status ${ad.isActive ? 'active' : 'inactive'}`}>
+                    {ad.isActive ? 'Active' : 'Inactive'}
+                  </span>
+                  <div className="admin-action-row">
+                    <button type="button" onClick={() => toggleAdStatus(ad)}>
+                      {ad.isActive ? 'Deactivate' : 'Activate'}
+                    </button>
+                    <button type="button" className="danger-btn" onClick={() => removeAd(ad._id)}>
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
       ) : null}
