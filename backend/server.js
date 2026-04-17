@@ -8,9 +8,14 @@ const User = require('./models/User');
 
 const ensureDefaultAdmin = async () => {
   try {
-    const adminEmail = (process.env.DEFAULT_ADMIN_EMAIL || 'admin22@gmail.com').toLowerCase();
-    const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'admin2209';
-    const adminName = process.env.DEFAULT_ADMIN_NAME || 'System Admin';
+    const adminEmail = String(process.env.DEFAULT_ADMIN_EMAIL || '').toLowerCase().trim();
+    const adminPassword = String(process.env.DEFAULT_ADMIN_PASSWORD || '');
+    const adminName = String(process.env.DEFAULT_ADMIN_NAME || 'System Admin').trim();
+
+    if (!adminEmail || !adminPassword) {
+      console.log('Default admin bootstrap skipped. Set DEFAULT_ADMIN_EMAIL and DEFAULT_ADMIN_PASSWORD in backend/.env');
+      return;
+    }
 
     const existingAdmin = await User.findOne({ email: adminEmail }).select('+password');
 

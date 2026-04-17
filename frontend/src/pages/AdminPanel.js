@@ -16,11 +16,19 @@ function AdminPanel({ token }) {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [selectedRoles, setSelectedRoles] = useState({});
+  const [activeSection, setActiveSection] = useState('dashboard');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   const roleOptions = ['user', 'seller', 'delivery_boy', 'admin'];
+  const menuItems = [
+    { id: 'dashboard', label: 'Dashboard' },
+    { id: 'features', label: 'Features' },
+    { id: 'users', label: 'Users' },
+    { id: 'products', label: 'Products' },
+    { id: 'orders', label: 'Orders' }
+  ];
 
   const loadAdminData = async () => {
     setLoading(true);
@@ -109,6 +117,22 @@ function AdminPanel({ token }) {
         <div className="admin-role-pill">Role: {panelData.role}</div>
       </section>
 
+      <section className="panel-page admin-menu-wrap">
+        <div className="admin-menu-row" role="tablist" aria-label="Admin Sections">
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={`admin-menu-btn ${activeSection === item.id ? 'active' : ''}`}
+              onClick={() => setActiveSection(item.id)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {activeSection === 'dashboard' ? (
       <section className="panel-page">
         <h3>Dashboard Summary</h3>
         <div className="admin-feature-grid">
@@ -126,7 +150,9 @@ function AdminPanel({ token }) {
           </article>
         </div>
       </section>
+      ) : null}
 
+      {activeSection === 'features' ? (
       <section className="admin-features panel-page">
         <h3>Access & Features</h3>
         <div className="admin-feature-grid">
@@ -138,7 +164,9 @@ function AdminPanel({ token }) {
           ))}
         </div>
       </section>
+      ) : null}
 
+      {activeSection === 'users' ? (
       <section className="panel-page">
         <h3>User Management</h3>
         <div className="cart-table-wrap">
@@ -182,7 +210,9 @@ function AdminPanel({ token }) {
           </table>
         </div>
       </section>
+      ) : null}
 
+      {activeSection === 'products' ? (
       <section className="panel-page">
         <h3>All Products</h3>
         <div className="cart-table-wrap">
@@ -210,7 +240,9 @@ function AdminPanel({ token }) {
           </table>
         </div>
       </section>
+      ) : null}
 
+      {activeSection === 'orders' ? (
       <section className="panel-page">
         <h3>All Orders</h3>
         <div className="cart-table-wrap">
@@ -238,6 +270,7 @@ function AdminPanel({ token }) {
           </table>
         </div>
       </section>
+      ) : null}
     </div>
   );
 }
