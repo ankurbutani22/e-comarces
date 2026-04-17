@@ -3,24 +3,6 @@ import ProductCard from '../components/ProductCard';
 import { API_ORIGIN } from '../config/api';
 import { getPublicAds } from '../services/authService';
 
-const FALLBACK_CAROUSEL_SLIDES = [
-  {
-    image: 'https://placehold.co/1200x420/17384d/f8fbff?text=Trending+Deals',
-    title: 'Trending Deals',
-    subtitle: 'Fresh picks added daily'
-  },
-  {
-    image: 'https://placehold.co/1200x420/2b6f87/f8fbff?text=Smart+Shopping+Flow',
-    title: 'Smart Shopping Flow',
-    subtitle: 'Compare prices and save more'
-  },
-  {
-    image: 'https://placehold.co/1200x420/2f7f75/f8fbff?text=Seller+Offers+Live',
-    title: 'Seller Offers Live',
-    subtitle: 'Latest products and discounts'
-  }
-];
-
 const resolveMediaUrl = (value) => {
   if (!value || typeof value !== 'string') return '';
   if (/^https?:\/\//i.test(value)) return value;
@@ -89,39 +71,8 @@ function ProductList({
       .filter((ad) => ad.image)
       .slice(0, 8);
 
-    if (adminSlides.length > 0) {
-      return adminSlides;
-    }
-
-    const productSlides = list
-      .map((product) => {
-        const candidates = [
-          product?.image,
-          ...(Array.isArray(product?.images) ? product.images : [])
-        ]
-          .map(resolveMediaUrl)
-          .filter(Boolean)
-          .filter((url) => !url.includes('via.placeholder.com'));
-
-        if (candidates.length === 0) return null;
-
-        const basePrice = Number(product?.price || 0);
-        const discountPercent = Math.min(95, Math.max(0, Number(product?.discountPercent || 0)));
-        const effectivePrice = Math.max(0, Math.round(basePrice - (basePrice * discountPercent) / 100));
-
-        return {
-          image: candidates[0],
-          title: product?.name || 'Featured Product',
-          subtitle: discountPercent > 0
-            ? `Now Rs. ${effectivePrice} (MRP Rs. ${basePrice})`
-            : `Price Rs. ${basePrice}`
-        };
-      })
-      .filter(Boolean)
-      .slice(0, 5);
-
-    return productSlides.length > 0 ? productSlides : FALLBACK_CAROUSEL_SLIDES;
-  }, [ads, list]);
+    return adminSlides;
+  }, [ads]);
 
   useEffect(() => {
     setActiveSlide(0);
@@ -160,42 +111,44 @@ function ProductList({
 
   return (
     <div className="storefront-shell">
-      <section className="home-carousel" aria-label="Featured products carousel">
-        <div className="home-carousel-track" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
-          {carouselSlides.map((slide, index) => (
-            <article className="home-carousel-slide" key={`${slide.image}-${index}`}>
-              <img src={slide.image} alt={slide.title} className="home-carousel-image" />
-              <div className="home-carousel-overlay">
-                <p className="home-carousel-kicker">{slide.companyName || 'Featured'}</p>
-                <h3>{slide.title}</h3>
-                <p>{slide.subtitle}</p>
-              </div>
-            </article>
-          ))}
-        </div>
+      {carouselSlides.length > 0 ? (
+        <section className="home-carousel" aria-label="Featured ads carousel">
+          <div className="home-carousel-track" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
+            {carouselSlides.map((slide, index) => (
+              <article className="home-carousel-slide" key={`${slide.image}-${index}`}>
+                <img src={slide.image} alt={slide.title} className="home-carousel-image" />
+                <div className="home-carousel-overlay">
+                  <p className="home-carousel-kicker">{slide.companyName || 'Featured'}</p>
+                  <h3>{slide.title}</h3>
+                  <p>{slide.subtitle}</p>
+                </div>
+              </article>
+            ))}
+          </div>
 
-        {carouselSlides.length > 1 ? (
-          <>
-            <button type="button" className="home-carousel-btn prev" onClick={goToPrevSlide} aria-label="Previous slide">
-              ‹
-            </button>
-            <button type="button" className="home-carousel-btn next" onClick={goToNextSlide} aria-label="Next slide">
-              ›
-            </button>
-            <div className="home-carousel-dots">
-              {carouselSlides.map((_, index) => (
-                <button
-                  key={`dot-${index}`}
-                  type="button"
-                  className={`home-carousel-dot ${activeSlide === index ? 'active' : ''}`}
-                  onClick={() => setActiveSlide(index)}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          </>
-        ) : null}
-      </section>
+          {carouselSlides.length > 1 ? (
+            <>
+              <button type="button" className="home-carousel-btn prev" onClick={goToPrevSlide} aria-label="Previous slide">
+                ‹
+              </button>
+              <button type="button" className="home-carousel-btn next" onClick={goToNextSlide} aria-label="Next slide">
+                ›
+              </button>
+              <div className="home-carousel-dots">
+                {carouselSlides.map((_, index) => (
+                  <button
+                    key={`dot-${index}`}
+                    type="button"
+                    className={`home-carousel-dot ${activeSlide === index ? 'active' : ''}`}
+                    onClick={() => setActiveSlide(index)}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
+            </>
+          ) : null}
+        </section>
+      ) : null}
 
       <div className="storefront-head">
         <div className="storefront-kicker">Featured Collection</div>
