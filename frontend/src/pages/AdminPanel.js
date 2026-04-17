@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import {
+  createAdminAd,
+  deleteAdminAd,
   deleteAdminUser,
+  getAdminAds,
   getAdminDashboard,
   getAdminOrders,
   getAdminPanel,
   getAdminProducts,
   getAdminUsers,
-  updateAdminUserRole
+  updateAdminAd,
+  updateAdminUserRole,
+  uploadSellerMedia
 } from '../services/authService';
 
 function AdminPanel({ token }) {
@@ -15,11 +20,21 @@ function AdminPanel({ token }) {
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [ads, setAds] = useState([]);
   const [selectedRoles, setSelectedRoles] = useState({});
   const [activeSection, setActiveSection] = useState('dashboard');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [adSubmitting, setAdSubmitting] = useState(false);
+  const [adImageFile, setAdImageFile] = useState(null);
+  const [adForm, setAdForm] = useState({
+    image: '',
+    title: '',
+    subtitle: '',
+    sortOrder: 0,
+    isActive: true
+  });
 
   const roleOptions = ['user', 'seller', 'delivery_boy', 'admin'];
   const menuItems = [
@@ -27,7 +42,8 @@ function AdminPanel({ token }) {
     { id: 'features', label: 'Features' },
     { id: 'users', label: 'Users' },
     { id: 'products', label: 'Products' },
-    { id: 'orders', label: 'Orders' }
+    { id: 'orders', label: 'Orders' },
+    { id: 'ads', label: 'Ads' }
   ];
 
   const loadAdminData = async () => {
@@ -35,12 +51,13 @@ function AdminPanel({ token }) {
     setError('');
 
     try {
-      const [panelRes, dashboardRes, usersRes, productsRes, ordersRes] = await Promise.all([
+      const [panelRes, dashboardRes, usersRes, productsRes, ordersRes, adsRes] = await Promise.all([
         getAdminPanel(token),
         getAdminDashboard(token),
         getAdminUsers(token),
         getAdminProducts(token),
-        getAdminOrders(token)
+        getAdminOrders(token),
+        getAdminAds(token)
       ]);
 
       setPanelData(panelRes.data);
@@ -48,6 +65,7 @@ function AdminPanel({ token }) {
       setUsers(usersRes.data || []);
       setProducts(productsRes.data || []);
       setOrders(ordersRes.data || []);
+      setAds(adsRes.data || []);
 
       const initialRoles = {};
       (usersRes.data || []).forEach((user) => {
@@ -100,6 +118,88 @@ function AdminPanel({ token }) {
       setSuccess('User deleted');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete user');
+    }
+  };
+
+  const onAdFormChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setAdForm((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const addAd = async () => {
+    setError('');
+    setSuccess('');
+
+    try {
+      setAdSubmitting(true);
+      let imageUrl = String(adForm.image || '').trim();
+
+      if (!imageUrl && adImageFile) {
+        const uploadRes = await uploadSellerMedia(token, [adImageFile], null);
+        imageUrl = uploadRes.data.image || uploadRes.data.images?.[0] || '';
+      }
+
+      if (!imageUrl) {
+        setError('Please provide ad image URL or upload image file');
+        return;
+      }
+
+      await createAdminAd(token, {
+        image: imageUrl,
+        title: adForm.title,
+        subtitle: adForm.subtitle,
+        sortOrder: Number(adForm.sortOrder || 0),
+        isActive: Boolean(adForm.isActive)
+      });
+
+      setAdForm({
+        image: '',
+        title: '',
+        subtitle: '',
+        sortOrder: 0,
+        isActive: true
+      });
+      setAdImageFile(null);
+
+      await loadAdminData();
+      setSuccess('Ad added successfully');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to add ad');
+    } finally {
+      setAdSubmitting(false);
+    }
+  };
+
+  const toggleAdStatus = async (ad) => {
+    setError('');
+    setSuccess('');
+
+    try {
+      await updateAdminAd(token, ad._id, { isActive: !ad.isActive });
+      await loadAdminData();
+      setSuccess('Ad status updated');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update ad status');
+    }
+  };
+
+  const removeAd = async (adId) => {
+    setError('');
+    setSuccess('');
+
+    if (!window.confirm('Are you sure you want to delete this ad image?')) {
+      return;
+    }
+
+    try {
+      await deleteAdminAd(token, adId);
+      await loadAdminData();
+      setSuccess('Ad deleted');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete ad');
     }
   };
 
@@ -264,6 +364,101 @@ function AdminPanel({ token }) {
                   <td>Rs. {order.totalAmount}</td>
                   <td>{order.status}</td>
                   <td>{new Date(order.createdAt).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      ) : null}
+
+      {activeSection === 'ads' ? (
+      <section className="panel-page">
+        <h3>Ads Management</h3>
+        <div style={{ display: 'grid', gap: '0.75rem', marginBottom: '1rem' }}>
+          <input
+            type="text"
+            name="title"
+            placeholder="Ad title"
+            value={adForm.title}
+            onChange={onAdFormChange}
+          />
+          <input
+            type="text"
+            name="subtitle"
+            placeholder="Ad subtitle"
+            value={adForm.subtitle}
+            onChange={onAdFormChange}
+          />
+          <input
+            type="text"
+            name="image"
+            placeholder="Ad image URL (optional if uploading file)"
+            value={adForm.image}
+            onChange={onAdFormChange}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setAdImageFile(e.target.files?.[0] || null)}
+          />
+          <input
+            type="number"
+            name="sortOrder"
+            placeholder="Sort order"
+            value={adForm.sortOrder}
+            onChange={onAdFormChange}
+          />
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <input
+              type="checkbox"
+              name="isActive"
+              checked={adForm.isActive}
+              onChange={onAdFormChange}
+            />
+            Active
+          </label>
+          <div>
+            <button type="button" onClick={addAd} disabled={adSubmitting}>
+              {adSubmitting ? 'Saving...' : 'Add Ad'}
+            </button>
+          </div>
+        </div>
+
+        <div className="cart-table-wrap">
+          <table className="cart-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Subtitle</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ads.map((ad) => (
+                <tr key={ad._id}>
+                  <td>
+                    <img
+                      src={ad.image}
+                      alt={ad.title || 'Ad'}
+                      style={{ width: '120px', height: '68px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #d9e3f1' }}
+                    />
+                  </td>
+                  <td>{ad.title || '-'}</td>
+                  <td>{ad.subtitle || '-'}</td>
+                  <td>{ad.isActive ? 'Active' : 'Inactive'}</td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <button type="button" onClick={() => toggleAdStatus(ad)}>
+                        {ad.isActive ? 'Deactivate' : 'Activate'}
+                      </button>
+                      <button type="button" className="danger-btn" onClick={() => removeAd(ad._id)}>
+                        Delete
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

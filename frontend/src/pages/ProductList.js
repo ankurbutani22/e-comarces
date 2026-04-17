@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import ProductCard from '../components/ProductCard';
 import { API_ORIGIN } from '../config/api';
+import { getPublicAds } from '../services/authService';
 
 const FALLBACK_CAROUSEL_SLIDES = [
   {
@@ -43,6 +44,7 @@ function ProductList({
   onClearFilters
 }) {
   const list = Array.isArray(products) ? products : [];
+  const [ads, setAds] = useState([]);
   const [activeSlide, setActiveSlide] = useState(0);
   const hasActiveFilters = searchQuery.trim() || sortBy !== 'featured';
   const sortOptions = [
@@ -54,7 +56,34 @@ function ProductList({
     ? `${list.length} result${list.length === 1 ? '' : 's'} found`
     : `${list.length} product${list.length === 1 ? '' : 's'} available`;
 
+  useEffect(() => {
+    const loadAds = async () => {
+      try {
+        const adRes = await getPublicAds();
+        setAds(adRes.data || []);
+      } catch (err) {
+        setAds([]);
+      }
+    };
+
+    loadAds();
+  }, []);
+
   const carouselSlides = useMemo(() => {
+    const adminSlides = (Array.isArray(ads) ? ads : [])
+      .filter((ad) => ad?.image)
+      .map((ad) => ({
+        image: resolveMediaUrl(ad.image),
+        title: ad.title || 'Featured Offer',
+        subtitle: ad.subtitle || 'Latest updates from admin'
+      }))
+      .filter((ad) => ad.image)
+      .slice(0, 8);
+
+    if (adminSlides.length > 0) {
+      return adminSlides;
+    }
+
     const productSlides = list
       .map((product) => {
         const candidates = [
@@ -83,7 +112,7 @@ function ProductList({
       .slice(0, 5);
 
     return productSlides.length > 0 ? productSlides : FALLBACK_CAROUSEL_SLIDES;
-  }, [list]);
+  }, [ads, list]);
 
   useEffect(() => {
     setActiveSlide(0);

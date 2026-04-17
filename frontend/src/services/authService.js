@@ -91,6 +91,47 @@ export const getAdminOrders = async (token) => {
   return response.data;
 };
 
+export const getPublicAds = async () => {
+  const response = await axios.get('/api/panel/ads');
+  return response.data;
+};
+
+export const getAdminAds = async (token) => {
+  const response = await axios.get('/api/panel/admin/ads', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+export const createAdminAd = async (token, payload) => {
+  const response = await axios.post('/api/panel/admin/ads', payload, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+export const updateAdminAd = async (token, adId, payload) => {
+  const response = await axios.put(`/api/panel/admin/ads/${adId}`, payload, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
+export const deleteAdminAd = async (token, adId) => {
+  const response = await axios.delete(`/api/panel/admin/ads/${adId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return response.data;
+};
+
 export const getSellerPanel = async (token) => {
   const response = await axios.get('/api/panel/seller', {
     headers: {
