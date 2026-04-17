@@ -439,7 +439,7 @@ function ProductDetail() {
     }
   }, [galleryImages]);
 
-  if (loading) return <div className="loading">Loading...</div>;
+  if (!product && loading) return null;
   if (!product) return <div className="loading">Product not found</div>;
 
   return (

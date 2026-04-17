@@ -98,12 +98,11 @@ function MyProfile({ token, onProfileUpdated }) {
     }
   };
 
-  if (loading) return <div className="loading">Loading profile...</div>;
-
   return (
     <div className="profile-shell">
       <div className="profile-card">
         <h2>My Profile</h2>
+        {loading ? <p className="loading">Refreshing profile...</p> : null}
 
         <form onSubmit={onSubmit} className="profile-form">
           <div>
@@ -126,7 +125,7 @@ function MyProfile({ token, onProfileUpdated }) {
             <textarea name="address" value={form.address} onChange={onChange} rows={4} />
           </div>
 
-          <button type="submit" disabled={saving} className="profile-save-btn">
+          <button type="submit" disabled={saving || loading} className="profile-save-btn">
             {saving ? 'Saving...' : 'Save Profile'}
           </button>
         </form>

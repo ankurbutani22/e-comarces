@@ -255,8 +255,7 @@ function AdminPanel({ token }) {
     }
   };
 
-  if (loading) return <p className="loading">Loading admin panel...</p>;
-  if (!panelData || !dashboard) return <p className="loading">Admin panel is unavailable. Please refresh.</p>;
+  if (!panelData || !dashboard) return <div className="admin-shell"><p className="loading">Please refresh to load admin panel.</p></div>;
 
   return (
     <div className="admin-shell">
@@ -265,6 +264,7 @@ function AdminPanel({ token }) {
         <h2>Admin Panel</h2>
         <p className="admin-subtitle">Manage platform operations with a clean, high-visibility dashboard.</p>
         <div className="admin-role-pill">Role: {panelData.role}</div>
+        {loading ? <p className="loading">Refreshing panel data...</p> : null}
       </section>
 
       <section className="panel-page admin-menu-wrap">

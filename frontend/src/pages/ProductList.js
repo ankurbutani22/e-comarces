@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 import ProductCard from '../components/ProductCard';
 import { API_ORIGIN } from '../config/api';
 import { getPublicAds } from '../services/authService';
@@ -101,18 +102,11 @@ function ProductList({
     return () => window.clearInterval(timer);
   }, [groupedSlides.length]);
 
-  if (loading) {
-    return <div className="loading">Loading products...</div>;
-  }
-
-  if (error) {
-    return (
-      <div>
-        <div className="error">{error}</div>
-        <button onClick={onRefresh}>Retry</button>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   return (
     <div className="storefront-shell">
@@ -151,6 +145,7 @@ function ProductList({
         <h2>Discover products with a cleaner browsing flow</h2>
         <p>Search from the header and use the price sort below for a focused shopping experience.</p>
       </div>
+      {loading ? <div className="loading">Refreshing products...</div> : null}
       <div className="product-toolbar-shell">
         <div className="product-toolbar-head">
           <div>
@@ -194,9 +189,10 @@ function ProductList({
         </div>
       ) : (
         <div className="loading">
-          {searchQuery.trim() ? 'No products match your search' : 'No products available'}
+          {loading ? 'Loading products...' : (searchQuery.trim() ? 'No products match your search' : 'No products available')}
         </div>
       )}
+      {error ? <button type="button" onClick={onRefresh}>Retry</button> : null}
     </div>
   );
 }

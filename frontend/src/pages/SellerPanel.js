@@ -578,8 +578,7 @@ function SellerPanel({ token, onProductAdded }) {
     printWindow.document.close();
   };
 
-  if (!panelData && tableLoading) return <p className="loading">Loading seller panel...</p>;
-  if (!panelData) return <p className="loading">Seller panel is unavailable. Please refresh.</p>;
+  if (!panelData) return <div className="seller-dashboard"><p className="loading">Please refresh to load seller panel.</p></div>;
 
   return (
     <div className="seller-dashboard">
@@ -606,6 +605,7 @@ function SellerPanel({ token, onProductAdded }) {
             <strong>{stats.orders}</strong>
           </div>
         </div>
+        {tableLoading ? <p className="loading">Refreshing seller data...</p> : null}
       </section>
 
       <div className="seller-workspace">

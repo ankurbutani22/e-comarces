@@ -223,7 +223,16 @@ function App() {
             <Route path="/unauthorized" element={<Unauthorized />} />
           </Routes>
         </main>
-        <ToastContainer position="top-right" autoClose={3000} pauseOnHover newestOnTop />
+        <ToastContainer
+          position="top-right"
+          autoClose={2800}
+          pauseOnHover
+          newestOnTop
+          closeButton
+          toastClassName="app-toast"
+          bodyClassName="app-toast-body"
+          progressClassName="app-toast-progress"
+        />
       </div>
     </Router>
   );

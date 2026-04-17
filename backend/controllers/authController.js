@@ -7,12 +7,28 @@ const signToken = (id) => {
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, phone, address } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !phone || !address) {
       return res.status(400).json({
         success: false,
-        message: 'Name, email, and password are required'
+        message: 'Name, email, password, phone, and address are required'
+      });
+    }
+
+    const normalizedPhone = String(phone).trim();
+    if (!/^\d{10}$/.test(normalizedPhone)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Phone number must be 10 digits'
+      });
+    }
+
+    const normalizedAddress = String(address).trim();
+    if (!normalizedAddress) {
+      return res.status(400).json({
+        success: false,
+        message: 'Address is required'
       });
     }
 
@@ -30,7 +46,9 @@ exports.register = async (req, res) => {
       name,
       email,
       password,
-      role: allowedRole
+      role: allowedRole,
+      phone: normalizedPhone,
+      address: normalizedAddress
     });
 
     const token = signToken(user._id);
@@ -42,7 +60,9 @@ exports.register = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        phone: user.phone,
+        address: user.address
       }
     });
   } catch (error) {

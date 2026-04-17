@@ -126,6 +126,17 @@ const appendTrackingEvent = (order, { status, note, updatedByRole }) => {
   });
 };
 
+const getDeliveryAgentNoteMeta = (user) => {
+  const actorName = normalizeTextValue(user?.name) || 'Delivery partner';
+  const actorAddress = normalizeTextValue(user?.address);
+
+  return {
+    actorName,
+    actorAddress,
+    actorSuffix: actorAddress ? `${actorName} (${actorAddress})` : actorName
+  };
+};
+
 const normalizeTextValue = (value) => {
   if (value === null || value === undefined) return '';
   return String(value).trim();
@@ -509,6 +520,14 @@ exports.sendDeliveryOtp = async (req, res) => {
       verifiedAt: null,
       attempts: 0
     };
+
+    const deliveryMeta = getDeliveryAgentNoteMeta(req.user);
+    appendTrackingEvent(order, {
+      status: order.status,
+      note: `Delivery OTP sent by ${deliveryMeta.actorSuffix}`,
+      updatedByRole: req.user.role || 'delivery_boy'
+    });
+
     await order.save();
 
     const smsResult = await sendOtpSms({
@@ -605,6 +624,14 @@ exports.verifyDeliveryOtp = async (req, res) => {
 
     order.deliveryOtp.verifiedAt = new Date();
     order.deliveryOtp.attempts = 0;
+
+    const deliveryMeta = getDeliveryAgentNoteMeta(req.user);
+    appendTrackingEvent(order, {
+      status: order.status,
+      note: `Customer OTP verified by ${deliveryMeta.actorSuffix}`,
+      updatedByRole: req.user.role || 'delivery_boy'
+    });
+
     await order.save();
 
     res.status(200).json({
@@ -776,9 +803,12 @@ exports.updateDeliveryOrderStatus = async (req, res) => {
       };
     }
 
+    const deliveryMeta = getDeliveryAgentNoteMeta(req.user);
+    const baseNote = status === 'shipped' ? 'Parcel reached destination city' : 'Parcel delivered to customer';
+
     appendTrackingEvent(order, {
       status,
-      note: status === 'shipped' ? 'Parcel reached destination city' : 'Parcel delivered to customer',
+      note: `${baseNote}. Updated by ${deliveryMeta.actorSuffix}`,
       updatedByRole: req.user.role || 'delivery_boy'
     });
 

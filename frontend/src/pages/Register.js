@@ -9,6 +9,8 @@ function Register({ onAuthSuccess }) {
     name: '',
     email: '',
     password: '',
+    phone: '',
+    address: '',
     role: 'user'
   });
   const [loading, setLoading] = useState(false);
@@ -28,6 +30,18 @@ function Register({ onAuthSuccess }) {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    if (!/^\d{10}$/.test((form.phone || '').trim())) {
+      setLoading(false);
+      setError('Phone number must be 10 digits');
+      return;
+    }
+
+    if (!(form.address || '').trim()) {
+      setLoading(false);
+      setError('Address is required');
+      return;
+    }
 
     try {
       const data = await registerUser(form);
@@ -99,6 +113,31 @@ function Register({ onAuthSuccess }) {
               onChange={onChange}
               required
               minLength={6}
+            />
+          </div>
+
+          <div className="auth-field">
+            <label>Phone Number</label>
+            <input
+              type="tel"
+              name="phone"
+              placeholder="10 digit phone number"
+              value={form.phone}
+              onChange={onChange}
+              required
+              pattern="[0-9]{10}"
+            />
+          </div>
+
+          <div className="auth-field">
+            <label>Address</label>
+            <textarea
+              name="address"
+              placeholder="Enter full address"
+              value={form.address}
+              onChange={onChange}
+              required
+              rows={3}
             />
           </div>
 

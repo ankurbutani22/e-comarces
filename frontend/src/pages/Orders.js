@@ -155,10 +155,6 @@ function Orders({ token }) {
     printWindow.document.close();
   };
 
-  if (loading) {
-    return <div className="loading">Loading your orders...</div>;
-  }
-
   return (
     <div className="orders-shell">
       <div className="page-head">
@@ -166,7 +162,9 @@ function Orders({ token }) {
         <button type="button" onClick={() => navigate('/')}>Continue Shopping</button>
       </div>
 
-      {!error && orders.length === 0 ? <p>No orders placed yet.</p> : null}
+      {loading ? <div className="loading">Refreshing your orders...</div> : null}
+
+      {!loading && !error && orders.length === 0 ? <p>No orders placed yet.</p> : null}
 
       <div className="orders-grid">
         {orders.map((order) => (

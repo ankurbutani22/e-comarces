@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 import {
   getDeliveryOrders,
   getDeliveryPanel,
@@ -39,6 +40,18 @@ function DeliveryPanel({ token }) {
   useEffect(() => {
     loadOrders();
   }, [loadOrders]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (success) {
+      toast.success(success);
+    }
+  }, [success]);
 
   const metrics = useMemo(() => ({
     orders: orders.length,
@@ -107,8 +120,6 @@ function DeliveryPanel({ token }) {
     return 'Cash On Delivery';
   };
 
-  if (loading) return <div className="loading">Loading delivery panel...</div>;
-
   return (
     <div className="delivery-shell">
       <section className="delivery-hero panel-page">
@@ -134,9 +145,6 @@ function DeliveryPanel({ token }) {
         </div>
       </section>
 
-      {error ? <div className="error">{error}</div> : null}
-      {success ? <div className="success-msg">{success}</div> : null}
-
       <section className="delivery-orders panel-page">
         <div className="section-head">
           <div>
@@ -145,7 +153,8 @@ function DeliveryPanel({ token }) {
           </div>
         </div>
 
-        {orders.length === 0 ? <p>No delivery orders available right now.</p> : null}
+        {loading ? <p className="loading">Refreshing delivery orders...</p> : null}
+        {!loading && orders.length === 0 ? <p>No delivery orders available right now.</p> : null}
 
         <div className="delivery-grid">
           {orders.map((order) => (
