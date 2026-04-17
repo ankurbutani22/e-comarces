@@ -90,6 +90,8 @@ function Orders({ token }) {
               ${item.selectedVariantName ? `<div style="font-size:12px;color:#555;">Design: ${item.selectedVariantName}</div>` : ''}
               ${item.selectedSize ? `<div style="font-size:12px;color:#555;">Size: ${item.selectedSize}</div>` : ''}
               ${item.selectedRamSize ? `<div style="font-size:12px;color:#555;">RAM: ${item.selectedRamSize}</div>` : ''}
+              ${item.selectedRomSize ? `<div style="font-size:12px;color:#555;">ROM: ${item.selectedRomSize}</div>` : ''}
+              ${item.selectedCustomOption ? `<div style="font-size:12px;color:#555;">Option: ${item.selectedCustomOption}</div>` : ''}
             </td>
             <td style="padding:8px;border:1px solid #ddd;text-align:center;">${item.quantity}</td>
             <td style="padding:8px;border:1px solid #ddd;text-align:right;">Rs. ${item.price}</td>
@@ -239,6 +241,8 @@ function Orders({ token }) {
                     {item.selectedVariantName ? <p className="order-item-qty">Design: {item.selectedVariantName}</p> : null}
                     {item.selectedSize ? <p className="order-item-qty">Size: {item.selectedSize}</p> : null}
                     {item.selectedRamSize ? <p className="order-item-qty">RAM: {item.selectedRamSize}</p> : null}
+                    {item.selectedRomSize ? <p className="order-item-qty">ROM: {item.selectedRomSize}</p> : null}
+                    {item.selectedCustomOption ? <p className="order-item-qty">Option: {item.selectedCustomOption}</p> : null}
                   </div>
                 </div>
               ))}

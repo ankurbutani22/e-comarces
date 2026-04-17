@@ -203,6 +203,8 @@ exports.createOrder = async (req, res) => {
 
       const selectedSize = normalizeTextValue(item.selectedSize);
       const selectedRamSize = normalizeTextValue(item.selectedRamSize);
+      const selectedRomSize = normalizeTextValue(item.selectedRomSize);
+      const selectedCustomOption = normalizeTextValue(item.selectedCustomOption);
       const selectedVariantIdInput = normalizeTextValue(item.selectedVariantId);
       const selectedVariantNameInput = normalizeTextValue(item.selectedVariantName);
 
@@ -231,6 +233,38 @@ exports.createOrder = async (req, res) => {
         return res.status(400).json({
           success: false,
           message: `Selected RAM size is invalid for ${matched.name}`
+        });
+      }
+
+      const availableRomSizes = Array.isArray(matched.romSizes) ? matched.romSizes : [];
+      if (availableRomSizes.length > 0 && !selectedRomSize) {
+        return res.status(400).json({
+          success: false,
+          message: `Please select ROM size for ${matched.name}`
+        });
+      }
+      if (selectedRomSize && availableRomSizes.length > 0 && !availableRomSizes.includes(selectedRomSize)) {
+        return res.status(400).json({
+          success: false,
+          message: `Selected ROM size is invalid for ${matched.name}`
+        });
+      }
+
+      const availableCustomOptions = Array.isArray(matched.customOptions) ? matched.customOptions : [];
+      if (availableCustomOptions.length > 0 && !selectedCustomOption) {
+        return res.status(400).json({
+          success: false,
+          message: `Please select customization option for ${matched.name}`
+        });
+      }
+      if (
+        selectedCustomOption &&
+        availableCustomOptions.length > 0 &&
+        !availableCustomOptions.includes(selectedCustomOption)
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: `Selected customization option is invalid for ${matched.name}`
         });
       }
 
@@ -275,6 +309,8 @@ exports.createOrder = async (req, res) => {
         productImage,
         selectedSize,
         selectedRamSize,
+        selectedRomSize,
+        selectedCustomOption,
         selectedVariantId: selectedVariant ? String(selectedVariant._id || selectedVariant.id) : '',
         selectedVariantName: selectedVariant ? String(selectedVariant.name || '') : '',
         selectedVariantImage,

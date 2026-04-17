@@ -35,6 +35,14 @@ const orderSchema = new mongoose.Schema(
           type: String,
           default: ''
         },
+        selectedRomSize: {
+          type: String,
+          default: ''
+        },
+        selectedCustomOption: {
+          type: String,
+          default: ''
+        },
         selectedVariantId: {
           type: String,
           default: ''

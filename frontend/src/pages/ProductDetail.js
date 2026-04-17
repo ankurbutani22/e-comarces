@@ -34,6 +34,8 @@ function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedRamSize, setSelectedRamSize] = useState('');
+  const [selectedRomSize, setSelectedRomSize] = useState('');
+  const [selectedCustomOption, setSelectedCustomOption] = useState('');
   const [selectedVariantId, setSelectedVariantId] = useState('');
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [placingOrder, setPlacingOrder] = useState(false);
@@ -67,6 +69,16 @@ function ProductDetail() {
       return;
     }
 
+    if (Array.isArray(product.romSizes) && product.romSizes.length > 0 && !selectedRomSize) {
+      alert('Please select ROM size first.');
+      return;
+    }
+
+    if (Array.isArray(product.customOptions) && product.customOptions.length > 0 && !selectedCustomOption) {
+      alert('Please select custom option first.');
+      return;
+    }
+
     if (Array.isArray(product.variants) && product.variants.length > 0 && !selectedVariantId) {
       alert('Please select design first.');
       return;
@@ -80,7 +92,7 @@ function ProductDetail() {
       ? selectedVariant.images[0]
       : '';
 
-    const cartKey = `${product._id}__${selectedSize || 'nosize'}__${selectedRamSize || 'noram'}__${selectedVariant?.name || 'nodefault'}`;
+    const cartKey = `${product._id}__${selectedSize || 'nosize'}__${selectedRamSize || 'noram'}__${selectedRomSize || 'norom'}__${selectedCustomOption || 'nocustom'}__${selectedVariant?.name || 'nodefault'}`;
 
     const cart = readLocalJson('cart', []);
     const existing = cart.find((item) => item.cartKey === cartKey);
@@ -94,6 +106,8 @@ function ProductDetail() {
         cartKey,
         selectedSize: selectedSize || '',
         selectedRamSize: selectedRamSize || '',
+        selectedRomSize: selectedRomSize || '',
+        selectedCustomOption: selectedCustomOption || '',
         selectedVariantId: selectedVariant ? String(selectedVariant._id || selectedVariant.id) : '',
         selectedVariantName: selectedVariant?.name || '',
         selectedVariantImage
@@ -117,6 +131,16 @@ function ProductDetail() {
 
     if (Array.isArray(product.ramSizes) && product.ramSizes.length > 0 && !selectedRamSize) {
       alert('Please select RAM size first.');
+      return false;
+    }
+
+    if (Array.isArray(product.romSizes) && product.romSizes.length > 0 && !selectedRomSize) {
+      alert('Please select ROM size first.');
+      return false;
+    }
+
+    if (Array.isArray(product.customOptions) && product.customOptions.length > 0 && !selectedCustomOption) {
+      alert('Please select custom option first.');
       return false;
     }
 
@@ -214,6 +238,8 @@ function ProductDetail() {
             quantity: 1,
             selectedSize: selectedSize || '',
             selectedRamSize: selectedRamSize || '',
+            selectedRomSize: selectedRomSize || '',
+            selectedCustomOption: selectedCustomOption || '',
             selectedVariantId: selectedVariant ? String(selectedVariant._id || selectedVariant.id) : '',
             selectedVariantName: selectedVariant?.name || '',
             selectedVariantImage:
@@ -287,6 +313,16 @@ function ProductDetail() {
     [product]
   );
 
+  const romSizeOptions = useMemo(
+    () => (Array.isArray(product?.romSizes) ? product.romSizes : []),
+    [product]
+  );
+
+  const customOptions = useMemo(
+    () => (Array.isArray(product?.customOptions) ? product.customOptions : []),
+    [product]
+  );
+
   const selectedVariant = useMemo(
     () => variantOptions.find((variant) => String(variant._id || variant.id) === String(selectedVariantId)) || null,
     [variantOptions, selectedVariantId]
@@ -295,6 +331,8 @@ function ProductDetail() {
   useEffect(() => {
     setSelectedSize('');
     setSelectedRamSize('');
+    setSelectedRomSize('');
+    setSelectedCustomOption('');
     if (variantOptions.length === 1) {
       setSelectedVariantId(String(variantOptions[0]._id || variantOptions[0].id));
     } else {
@@ -422,6 +460,42 @@ function ProductDetail() {
             </div>
           ) : null}
 
+          {romSizeOptions.length > 0 ? (
+            <div className="selection-block">
+              <p className="selector-label">Select ROM</p>
+              <div className="chip-row">
+                {romSizeOptions.map((romSize) => (
+                  <button
+                    key={romSize}
+                    type="button"
+                    className={`option-chip ${selectedRomSize === romSize ? 'active' : ''}`}
+                    onClick={() => setSelectedRomSize(romSize)}
+                  >
+                    {romSize}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {customOptions.length > 0 ? (
+            <div className="selection-block">
+              <p className="selector-label">Select Custom Option</p>
+              <div className="chip-row">
+                {customOptions.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    className={`option-chip ${selectedCustomOption === option ? 'active' : ''}`}
+                    onClick={() => setSelectedCustomOption(option)}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           {variantOptions.length > 0 ? (
             <div className="selection-block">
               <p className="selector-label">Select Design</p>
@@ -472,9 +546,12 @@ function ProductDetail() {
             </button>
           </div>
 
-          {(sizeOptions.length > 0 || variantOptions.length > 0) && (
+          {(sizeOptions.length > 0 || ramSizeOptions.length > 0 || romSizeOptions.length > 0 || customOptions.length > 0 || variantOptions.length > 0) && (
             <p className="selection-hint">
               {sizeOptions.length > 0 && !selectedSize ? 'Please select size. ' : ''}
+              {ramSizeOptions.length > 0 && !selectedRamSize ? 'Please select RAM. ' : ''}
+              {romSizeOptions.length > 0 && !selectedRomSize ? 'Please select ROM. ' : ''}
+              {customOptions.length > 0 && !selectedCustomOption ? 'Please select custom option. ' : ''}
               {variantOptions.length > 0 && !selectedVariantId ? 'Please select design.' : ''}
             </p>
           )}
@@ -487,6 +564,9 @@ function ProductDetail() {
             <h3>Confirm Order</h3>
             <p className="buy-modal-subtitle">{product.name} - ₹{product.price}</p>
             {selectedSize ? <p className="buy-modal-subtitle">Size: {selectedSize}</p> : null}
+            {selectedRamSize ? <p className="buy-modal-subtitle">RAM: {selectedRamSize}</p> : null}
+            {selectedRomSize ? <p className="buy-modal-subtitle">ROM: {selectedRomSize}</p> : null}
+            {selectedCustomOption ? <p className="buy-modal-subtitle">Option: {selectedCustomOption}</p> : null}
             {selectedVariant?.name ? <p className="buy-modal-subtitle">Design: {selectedVariant.name}</p> : null}
 
             <label>Name</label>

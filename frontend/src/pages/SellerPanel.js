@@ -28,6 +28,10 @@ function SellerPanel({ token, onProductAdded }) {
   const [sizeInput, setSizeInput] = useState('');
   const [ramSizes, setRamSizes] = useState([]);
   const [ramSizeInput, setRamSizeInput] = useState('');
+  const [romSizes, setRomSizes] = useState([]);
+  const [romSizeInput, setRomSizeInput] = useState('');
+  const [customOptions, setCustomOptions] = useState([]);
+  const [customOptionInput, setCustomOptionInput] = useState('');
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -69,6 +73,18 @@ function SellerPanel({ token, onProductAdded }) {
     mediaReady: (form.images?.length || 0) + (form.video ? 1 : 0)
   }), [form.images, form.video, myProducts.length, sellerOrders.length]);
 
+  const categoryOptionPresets = useMemo(() => ({
+    Electronics: ['Warranty', 'Color', 'Plug Type'],
+    Clothing: ['Sleeve Type', 'Fit', 'Fabric'],
+    Mobile: ['Color', 'Network Type', 'Warranty'],
+    Cosmetic: ['Skin Type', 'Shade', 'Fragrance'],
+    Novelty: ['Theme', 'Material', 'Gift Wrap'],
+    Books: ['Language', 'Binding', 'Edition'],
+    Home: ['Material', 'Finish', 'Pack Size'],
+    Sports: ['Grip', 'Weight', 'Usage Level'],
+    Other: ['Color', 'Material', 'Pack Type']
+  }), []);
+
   const onChange = (e) => {
     const { name, value } = e.target;
 
@@ -80,6 +96,8 @@ function SellerPanel({ token, onProductAdded }) {
       if (value !== 'Mobile') {
         setRamSizes([]);
         setRamSizeInput('');
+        setRomSizes([]);
+        setRomSizeInput('');
       }
     }
 
@@ -147,6 +165,36 @@ function SellerPanel({ token, onProductAdded }) {
     setRamSizes(ramSizes.filter(ram => ram !== ramToRemove));
   };
 
+  const addRomSize = () => {
+    const normalizedValue = romSizeInput.trim().toUpperCase();
+    if (normalizedValue && !romSizes.includes(normalizedValue)) {
+      setRomSizes([...romSizes, normalizedValue]);
+      setRomSizeInput('');
+    }
+  };
+
+  const removeRomSize = (romToRemove) => {
+    setRomSizes(romSizes.filter(rom => rom !== romToRemove));
+  };
+
+  const addCustomOption = () => {
+    const normalizedValue = customOptionInput.trim();
+    if (normalizedValue && !customOptions.includes(normalizedValue)) {
+      setCustomOptions([...customOptions, normalizedValue]);
+      setCustomOptionInput('');
+    }
+  };
+
+  const addCustomPreset = (option) => {
+    if (option && !customOptions.includes(option)) {
+      setCustomOptions([...customOptions, option]);
+    }
+  };
+
+  const removeCustomOption = (optionToRemove) => {
+    setCustomOptions(customOptions.filter(option => option !== optionToRemove));
+  };
+
   const refreshProducts = async () => {
     const productRes = await getMySellerProducts(token);
     setMyProducts(productRes.data || []);
@@ -203,7 +251,9 @@ function SellerPanel({ token, onProductAdded }) {
           images: v.images || []
         })) || undefined,
         sizes: form.category === 'Clothing' ? sizes : undefined,
-        ramSizes: form.category === 'Mobile' ? ramSizes : undefined
+        ramSizes: form.category === 'Mobile' ? ramSizes : undefined,
+        romSizes: form.category === 'Mobile' ? romSizes : undefined,
+        customOptions: customOptions.length > 0 ? customOptions : undefined
       });
 
       await refreshProducts();
@@ -226,6 +276,10 @@ function SellerPanel({ token, onProductAdded }) {
       setSizeInput('');
       setRamSizes([]);
       setRamSizeInput('');
+      setRomSizes([]);
+      setRomSizeInput('');
+      setCustomOptions([]);
+      setCustomOptionInput('');
       setVariantImageFiles({});
       resetMediaSelection();
     } catch (err) {
@@ -544,6 +598,8 @@ function SellerPanel({ token, onProductAdded }) {
                   <option value="Electronics">Electronics</option>
                   <option value="Clothing">Clothing</option>
                   <option value="Mobile">Mobile</option>
+                  <option value="Cosmetic">Cosmetic</option>
+                  <option value="Novelty">Novelty</option>
                   <option value="Books">Books</option>
                   <option value="Home">Home</option>
                   <option value="Sports">Sports</option>
@@ -579,11 +635,11 @@ function SellerPanel({ token, onProductAdded }) {
 
               {form.category === 'Mobile' && (
                 <div className="field-span-2 sizes-section">
-                  <label>RAM Sizes</label>
-                  <div className="size-input-group">
+                  <label>Mobile Storage Options</label>
+                  <div className="size-input-group" style={{ marginBottom: '0.75rem' }}>
                     <input
                       type="text"
-                      placeholder="e.g., 4GB, 6GB, 8GB, 12GB"
+                      placeholder="RAM: e.g., 4GB, 6GB, 8GB"
                       value={ramSizeInput}
                       onChange={(e) => setRamSizeInput(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addRamSize())}
@@ -600,8 +656,68 @@ function SellerPanel({ token, onProductAdded }) {
                       </span>
                     ))}
                   </div>
+
+                  <div className="size-input-group" style={{ marginTop: '0.9rem' }}>
+                    <input
+                      type="text"
+                      placeholder="ROM: e.g., 64GB, 128GB, 256GB"
+                      value={romSizeInput}
+                      onChange={(e) => setRomSizeInput(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addRomSize())}
+                    />
+                    <button type="button" className="ghost-btn" onClick={addRomSize}>
+                      Add ROM
+                    </button>
+                  </div>
+                  <div className="size-chips">
+                    {romSizes.map((rom) => (
+                      <span key={rom} className="size-chip">
+                        {rom}
+                        <button type="button" onClick={() => removeRomSize(rom)}>×</button>
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
+
+              <div className="field-span-2 sizes-section">
+                <label>Customizable Options (All Categories)</label>
+                <div className="size-input-group">
+                  <input
+                    type="text"
+                    placeholder="e.g., Color, Pattern, Packaging, Fragrance"
+                    value={customOptionInput}
+                    onChange={(e) => setCustomOptionInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomOption())}
+                  />
+                  <button type="button" className="ghost-btn" onClick={addCustomOption}>
+                    Add Option
+                  </button>
+                </div>
+
+                <div className="size-chips" style={{ marginTop: '0.6rem' }}>
+                  {(categoryOptionPresets[form.category] || []).map((option) => (
+                    <button
+                      type="button"
+                      key={`${form.category}-${option}`}
+                      className="ghost-btn"
+                      onClick={() => addCustomPreset(option)}
+                      disabled={customOptions.includes(option)}
+                    >
+                      + {option}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="size-chips">
+                  {customOptions.map((option) => (
+                    <span key={option} className="size-chip">
+                      {option}
+                      <button type="button" onClick={() => removeCustomOption(option)}>×</button>
+                    </span>
+                  ))}
+                </div>
+              </div>
 
               <div className="field-span-2 variants-section">
                 <div className="variants-header">
@@ -768,6 +884,16 @@ function SellerPanel({ token, onProductAdded }) {
                     {product.ramSizes && product.ramSizes.length > 0 && (
                       <div className="product-sizes-badge">
                         <span className="badge">RAM: {product.ramSizes.join(', ')}</span>
+                      </div>
+                    )}
+                    {product.romSizes && product.romSizes.length > 0 && (
+                      <div className="product-sizes-badge">
+                        <span className="badge">ROM: {product.romSizes.join(', ')}</span>
+                      </div>
+                    )}
+                    {product.customOptions && product.customOptions.length > 0 && (
+                      <div className="product-sizes-badge">
+                        <span className="badge">Custom: {product.customOptions.join(', ')}</span>
                       </div>
                     )}
                     <div className="seller-actions">

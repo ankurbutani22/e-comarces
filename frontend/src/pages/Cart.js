@@ -146,6 +146,8 @@ function Cart() {
               ${item.selectedVariantName ? `<div style="font-size:12px;color:#555;">Design: ${item.selectedVariantName}</div>` : ''}
               ${item.selectedSize ? `<div style="font-size:12px;color:#555;">Size: ${item.selectedSize}</div>` : ''}
               ${item.selectedRamSize ? `<div style="font-size:12px;color:#555;">RAM: ${item.selectedRamSize}</div>` : ''}
+              ${item.selectedRomSize ? `<div style="font-size:12px;color:#555;">ROM: ${item.selectedRomSize}</div>` : ''}
+              ${item.selectedCustomOption ? `<div style="font-size:12px;color:#555;">Option: ${item.selectedCustomOption}</div>` : ''}
             </td>
             <td style="padding:8px;border:1px solid #ddd;text-align:center;">${item.quantity}</td>
             <td style="padding:8px;border:1px solid #ddd;text-align:right;">Rs. ${item.price}</td>
@@ -269,6 +271,8 @@ function Cart() {
           quantity: item.quantity,
           selectedSize: item.selectedSize || '',
           selectedRamSize: item.selectedRamSize || '',
+          selectedRomSize: item.selectedRomSize || '',
+          selectedCustomOption: item.selectedCustomOption || '',
           selectedVariantId: item.selectedVariantId || '',
           selectedVariantName: item.selectedVariantName || '',
           selectedVariantImage: item.selectedVariantImage || ''
@@ -320,6 +324,8 @@ function Cart() {
                     <p className="cart-item-name">{item.name}</p>
                     {item.selectedSize ? <p className="cart-item-meta">Size: {item.selectedSize}</p> : null}
                     {item.selectedRamSize ? <p className="cart-item-meta">RAM: {item.selectedRamSize}</p> : null}
+                    {item.selectedRomSize ? <p className="cart-item-meta">ROM: {item.selectedRomSize}</p> : null}
+                    {item.selectedCustomOption ? <p className="cart-item-meta">Option: {item.selectedCustomOption}</p> : null}
                     {item.selectedVariantName ? <p className="cart-item-meta">Design: {item.selectedVariantName}</p> : null}
                   </td>
                   <td className="cart-center">₹{item.price}</td>
@@ -518,6 +524,8 @@ function Cart() {
                         {item.selectedVariantName ? <p className="order-item-qty">Design: {item.selectedVariantName}</p> : null}
                         {item.selectedSize ? <p className="order-item-qty">Size: {item.selectedSize}</p> : null}
                         {item.selectedRamSize ? <p className="order-item-qty">RAM: {item.selectedRamSize}</p> : null}
+                        {item.selectedRomSize ? <p className="order-item-qty">ROM: {item.selectedRomSize}</p> : null}
+                        {item.selectedCustomOption ? <p className="order-item-qty">Option: {item.selectedCustomOption}</p> : null}
                       </div>
                     </div>
                   ))}
