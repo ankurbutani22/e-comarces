@@ -161,6 +161,13 @@ function AdminPanel({ token }) {
     setAdImageFile(null);
   };
 
+  const clearAdImageUrl = () => {
+    setAdForm((prev) => ({
+      ...prev,
+      image: ''
+    }));
+  };
+
   const addAd = async () => {
     setError('');
     setSuccess('');
@@ -396,15 +403,25 @@ function AdminPanel({ token }) {
         <div className="admin-ads-layout">
           <div className="admin-ads-form-card">
             <div className="admin-ads-form">
-              <label className="admin-field-label" htmlFor="admin-ad-image-url">Ad Image URL</label>
-              <input
-                id="admin-ad-image-url"
-                type="text"
-                name="image"
-                placeholder="Ad image URL (optional if uploading file)"
-                value={adForm.image}
-                onChange={onAdFormChange}
-              />
+              <div className="admin-url-box">
+                <label className="admin-field-label" htmlFor="admin-ad-image-url">Ad Image URL</label>
+                <p className="admin-field-help">Paste direct image link from Cloudinary/CDN for faster add.</p>
+                <div className="admin-url-row">
+                  <input
+                    id="admin-ad-image-url"
+                    type="text"
+                    name="image"
+                    placeholder="https://example.com/ad-banner.jpg"
+                    value={adForm.image}
+                    onChange={onAdFormChange}
+                  />
+                  {adForm.image ? (
+                    <button type="button" className="admin-url-clear-btn" onClick={clearAdImageUrl}>
+                      Clear
+                    </button>
+                  ) : null}
+                </div>
+              </div>
 
               <p className="admin-upload-divider">OR</p>
 

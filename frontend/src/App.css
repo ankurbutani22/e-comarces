@@ -1912,6 +1912,41 @@ button:hover {
   letter-spacing: 0.08em;
 }
 
+.admin-field-help {
+  margin: -0.15rem 0 0;
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+.admin-url-box {
+  border: 1px solid #d4e2ef;
+  border-radius: 12px;
+  padding: 0.65rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f5fafe 100%);
+  display: grid;
+  gap: 0.55rem;
+}
+
+.admin-url-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.admin-url-clear-btn {
+  border-radius: 10px;
+  padding: 0.48rem 0.7rem;
+  font-size: 0.78rem;
+  border: 1px solid #c7d7e6;
+  background: #edf3f9;
+  color: #1f3a56;
+}
+
+.admin-url-clear-btn:hover {
+  background: #dfe9f3;
+}
+
 .admin-upload-divider {
   margin: 0;
   text-align: center;
@@ -3361,6 +3396,14 @@ select,
   .admin-ads-form input,
   .admin-ads-form select,
   .admin-ads-form textarea {
+    width: 100%;
+  }
+
+  .admin-url-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-url-clear-btn {
     width: 100%;
   }
 
