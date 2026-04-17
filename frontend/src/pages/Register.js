@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { registerUser } from '../services/authService';
 
 function Register({ onAuthSuccess }) {
@@ -13,6 +14,12 @@ function Register({ onAuthSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
   const onChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -25,6 +32,7 @@ function Register({ onAuthSuccess }) {
     try {
       const data = await registerUser(form);
       onAuthSuccess(data.user, data.token);
+      toast.success('Registration successful');
 
       if (data.user.role === 'admin') {
         navigate('/admin');
@@ -56,7 +64,6 @@ function Register({ onAuthSuccess }) {
         <form className="auth-card modern-auth-card" onSubmit={onSubmit}>
           <h2>Register</h2>
           <p className="auth-subtitle">Create your account in less than a minute.</p>
-          {error ? <p className="error">{error}</p> : null}
 
           <div className="auth-field">
             <label>Full Name</label>

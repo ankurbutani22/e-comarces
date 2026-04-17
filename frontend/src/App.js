@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import { readLocalJson } from './utils/storage';
 import Header from './components/Header';
@@ -103,6 +105,7 @@ function App() {
       setError(null);
     } catch (err) {
       setError('Failed to fetch products');
+      toast.error('Failed to fetch products');
       console.error(err);
     } finally {
       setLoading(false);
@@ -220,6 +223,7 @@ function App() {
             <Route path="/unauthorized" element={<Unauthorized />} />
           </Routes>
         </main>
+        <ToastContainer position="top-right" autoClose={3000} pauseOnHover newestOnTop />
       </div>
     </Router>
   );

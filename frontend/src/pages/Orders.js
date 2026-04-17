@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { getMyOrders } from '../services/authService';
 
 const ORDER_ITEM_PLACEHOLDER =
@@ -80,6 +81,12 @@ function Orders({ token }) {
     loadOrders();
   }, [loadOrders]);
 
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
   const printOrderBill = (order) => {
     const itemsHtml = order.items
       .map(
@@ -103,7 +110,7 @@ function Orders({ token }) {
 
     const printWindow = window.open('', '_blank', 'width=900,height=700');
     if (!printWindow) {
-      alert('Please allow popups to print bill.');
+      toast.warn('Please allow popups to print bill.');
       return;
     }
 
@@ -158,8 +165,6 @@ function Orders({ token }) {
         <h2 className="page-title">My Orders</h2>
         <button type="button" onClick={() => navigate('/')}>Continue Shopping</button>
       </div>
-
-      {error ? <div className="error page-feedback">{error}</div> : null}
 
       {!error && orders.length === 0 ? <p>No orders placed yet.</p> : null}
 

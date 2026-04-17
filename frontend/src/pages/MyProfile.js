@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { getProfile, updateProfile } from '../services/authService';
 import { readLocalJson } from '../utils/storage';
 
@@ -35,6 +36,18 @@ function MyProfile({ token, onProfileUpdated }) {
 
     loadProfile();
   }, [token]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (success) {
+      toast.success(success);
+    }
+  }, [success]);
 
   const onChange = (e) => {
     setForm((prev) => ({
@@ -91,8 +104,6 @@ function MyProfile({ token, onProfileUpdated }) {
     <div className="profile-shell">
       <div className="profile-card">
         <h2>My Profile</h2>
-        {error ? <div className="error profile-msg">{error}</div> : null}
-        {success ? <div className="success-msg profile-msg">{success}</div> : null}
 
         <form onSubmit={onSubmit} className="profile-form">
           <div>

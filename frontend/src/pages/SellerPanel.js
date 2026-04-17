@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 import {
   createSellerProduct,
   deleteSellerProduct,
@@ -67,6 +68,18 @@ function SellerPanel({ token, onProductAdded }) {
 
     load();
   }, [token]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (success) {
+      toast.success(success);
+    }
+  }, [success]);
 
   const stats = useMemo(() => ({
     products: myProducts.length,
@@ -519,7 +532,7 @@ function SellerPanel({ token, onProductAdded }) {
 
     const printWindow = window.open('', '_blank', 'width=900,height=700');
     if (!printWindow) {
-      alert('Please allow popups to print bill.');
+      toast.warn('Please allow popups to print bill.');
       return;
     }
 
@@ -565,12 +578,11 @@ function SellerPanel({ token, onProductAdded }) {
     printWindow.document.close();
   };
 
-  if (error) return <p className="error">{error}</p>;
-  if (!panelData) return <p className="loading">Loading seller panel...</p>;
+  if (!panelData && tableLoading) return <p className="loading">Loading seller panel...</p>;
+  if (!panelData) return <p className="loading">Seller panel is unavailable. Please refresh.</p>;
 
   return (
     <div className="seller-dashboard">
-      {success ? <p className="success-msg">{success}</p> : null}
       <section className="seller-hero panel-page">
         <div className="seller-hero-copy-wrap">
           <p className="eyebrow">Seller Studio</p>

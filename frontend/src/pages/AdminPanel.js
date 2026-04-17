@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 import {
   createAdminAd,
   deleteAdminAd,
@@ -99,6 +100,18 @@ function AdminPanel({ token }) {
     loadAdminData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (success) {
+      toast.success(success);
+    }
+  }, [success]);
 
   const onChangeRole = (userId, role) => {
     setSelectedRoles((prev) => ({
@@ -242,13 +255,11 @@ function AdminPanel({ token }) {
     }
   };
 
-  if (error) return <p className="error">{error}</p>;
-  if (loading || !panelData || !dashboard) return <p className="loading">Loading admin panel...</p>;
+  if (loading) return <p className="loading">Loading admin panel...</p>;
+  if (!panelData || !dashboard) return <p className="loading">Admin panel is unavailable. Please refresh.</p>;
 
   return (
     <div className="admin-shell">
-      {success ? <p className="success-msg">{success}</p> : null}
-
       <section className="admin-hero panel-page">
         <p className="section-kicker">Control Center</p>
         <h2>Admin Panel</h2>

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { createOrder, getMyOrders, rateProduct } from '../services/authService';
 import { readLocalJson } from '../utils/storage';
 
@@ -56,37 +57,37 @@ function ProductDetail() {
 
   const handleAddToCart = () => {
     if (isSeller) {
-      alert('Seller account cannot add products to cart.');
+      toast.error('Seller account cannot add products to cart.');
       return;
     }
 
     if (product.stock === 0) {
-      alert('This product is out of stock.');
+      toast.error('This product is out of stock.');
       return;
     }
 
     if (Array.isArray(product.sizes) && product.sizes.length > 0 && !selectedSize) {
-      alert('Please select size first.');
+      toast.error('Please select size first.');
       return;
     }
 
     if (Array.isArray(product.ramSizes) && product.ramSizes.length > 0 && !selectedRamSize) {
-      alert('Please select RAM size first.');
+      toast.error('Please select RAM size first.');
       return;
     }
 
     if (Array.isArray(product.romSizes) && product.romSizes.length > 0 && !selectedRomSize) {
-      alert('Please select ROM size first.');
+      toast.error('Please select ROM size first.');
       return;
     }
 
     if (Array.isArray(product.customOptions) && product.customOptions.length > 0 && !selectedCustomOption) {
-      alert('Please select custom option first.');
+      toast.error('Please select custom option first.');
       return;
     }
 
     if (Array.isArray(product.variants) && product.variants.length > 0 && !selectedVariantId) {
-      alert('Please select design first.');
+      toast.error('Please select design first.');
       return;
     }
 
@@ -123,37 +124,37 @@ function ProductDetail() {
     }
 
     localStorage.setItem('cart', JSON.stringify(cart));
-    alert('Added to cart!');
+    toast.success('Added to cart!');
   };
 
   const canProceedWithVariantSelection = () => {
     if (product.stock === 0) {
-      alert('This product is out of stock.');
+      toast.error('This product is out of stock.');
       return false;
     }
 
     if (Array.isArray(product.sizes) && product.sizes.length > 0 && !selectedSize) {
-      alert('Please select size first.');
+      toast.error('Please select size first.');
       return false;
     }
 
     if (Array.isArray(product.ramSizes) && product.ramSizes.length > 0 && !selectedRamSize) {
-      alert('Please select RAM size first.');
+      toast.error('Please select RAM size first.');
       return false;
     }
 
     if (Array.isArray(product.romSizes) && product.romSizes.length > 0 && !selectedRomSize) {
-      alert('Please select ROM size first.');
+      toast.error('Please select ROM size first.');
       return false;
     }
 
     if (Array.isArray(product.customOptions) && product.customOptions.length > 0 && !selectedCustomOption) {
-      alert('Please select custom option first.');
+      toast.error('Please select custom option first.');
       return false;
     }
 
     if (Array.isArray(product.variants) && product.variants.length > 0 && !selectedVariantId) {
-      alert('Please select design first.');
+      toast.error('Please select design first.');
       return false;
     }
 
@@ -162,12 +163,12 @@ function ProductDetail() {
 
   const openBuyModal = () => {
     if (isSeller) {
-      alert('Seller account cannot place order.');
+      toast.error('Seller account cannot place order.');
       return;
     }
 
     if (!user) {
-      alert('Please login first.');
+      toast.error('Please login first.');
       navigate('/login');
       return;
     }
@@ -191,44 +192,44 @@ function ProductDetail() {
     const token = localStorage.getItem('token') || '';
 
     if (!token) {
-      alert('Please login first.');
+      toast.error('Please login first.');
       navigate('/login');
       return;
     }
 
     if (!buyName.trim()) {
-      alert('Please enter name.');
+      toast.error('Please enter name.');
       return;
     }
 
     if (!/^\d{10}$/.test(buyPhone.trim())) {
-      alert('Please enter valid 10 digit phone number.');
+      toast.error('Please enter valid 10 digit phone number.');
       return;
     }
 
     if (!buyAddress.trim()) {
-      alert('Please enter address.');
+      toast.error('Please enter address.');
       return;
     }
 
     if (buyPaymentMethod === 'credit_card' || buyPaymentMethod === 'debit_card') {
       if (!/^\d{16}$/.test((buyCardNumber || '').replace(/\s+/g, ''))) {
-        alert('Please enter valid 16 digit card number.');
+        toast.error('Please enter valid 16 digit card number.');
         return;
       }
 
       if (!buyCardHolder.trim()) {
-        alert('Please enter card holder name.');
+        toast.error('Please enter card holder name.');
         return;
       }
 
       if (!/^(0[1-9]|1[0-2])\/(\d{2})$/.test(buyCardExpiry.trim())) {
-        alert('Please enter expiry in MM/YY format.');
+        toast.error('Please enter expiry in MM/YY format.');
         return;
       }
 
       if (!/^\d{3,4}$/.test(buyCardCvv.trim())) {
-        alert('Please enter valid CVV.');
+        toast.error('Please enter valid CVV.');
         return;
       }
     }
@@ -259,10 +260,10 @@ function ProductDetail() {
       });
 
       setShowBuyModal(false);
-      alert('Order confirmed successfully!');
+      toast.success('Order confirmed successfully!');
       navigate('/orders');
     } catch (err) {
-      alert(err.response?.data?.message || 'Order confirm failed');
+      toast.error(err.response?.data?.message || 'Order confirm failed');
     } finally {
       setPlacingOrder(false);
     }
@@ -285,6 +286,12 @@ function ProductDetail() {
   useEffect(() => {
     fetchProductDetail();
   }, [fetchProductDetail]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   useEffect(() => {
     const token = localStorage.getItem('token') || '';
@@ -374,18 +381,18 @@ function ProductDetail() {
     const token = localStorage.getItem('token') || '';
 
     if (!token || !user) {
-      alert('Please login to rate product');
+      toast.error('Please login to rate product');
       navigate('/login');
       return;
     }
 
     if (!hasOrderedProduct) {
-      alert('You can rate this product only after placing an order for it');
+      toast.error('You can rate this product only after placing an order for it');
       return;
     }
 
     if (ratingValue < 1 || ratingValue > 5) {
-      alert('Please select rating from 1 to 5');
+      toast.error('Please select rating from 1 to 5');
       return;
     }
 
@@ -393,9 +400,9 @@ function ProductDetail() {
       setRatingSaving(true);
       const ratingRes = await rateProduct(token, product._id, ratingValue);
       setProduct(ratingRes?.data || product);
-      alert(ratingRes?.message || 'Rating saved successfully');
+      toast.success(ratingRes?.message || 'Rating saved successfully');
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to save rating');
+      toast.error(err.response?.data?.message || 'Failed to save rating');
     } finally {
       setRatingSaving(false);
     }
@@ -433,7 +440,6 @@ function ProductDetail() {
   }, [galleryImages]);
 
   if (loading) return <div className="loading">Loading...</div>;
-  if (error) return <div className="error">{error}</div>;
   if (!product) return <div className="loading">Product not found</div>;
 
   return (
@@ -527,10 +533,10 @@ function ProductDetail() {
               ))}
             </div>
 
-            {!user ? <p className="selection-hint">Login કરો પછી rating આપી શકશો.</p> : null}
-            {user && user?.role === 'seller' ? <p className="selection-hint">Seller account થી rating આપી શકાતી નથી.</p> : null}
+            {!user ? <p className="selection-hint">Login to submit a rating.</p> : null}
+            {user && user?.role === 'seller' ? <p className="selection-hint">Seller accounts cannot submit ratings.</p> : null}
             {user && user?.role !== 'seller' && !hasOrderedProduct ? (
-              <p className="selection-hint">Order કર્યા પછી જ આ product ને rating આપી શકશો.</p>
+              <p className="selection-hint">You can rate this product only after placing an order.</p>
             ) : null}
 
             <button

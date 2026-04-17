@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { createOrder, getMyOrders, getProfile } from '../services/authService';
 import { readLocalJson } from '../utils/storage';
 
@@ -74,7 +75,7 @@ function Cart() {
 
   useEffect(() => {
     if (user?.role === 'seller') {
-      alert('Seller account cannot use cart.');
+      toast.error('Seller account cannot use cart.');
       navigate('/seller');
     }
   }, [user, navigate]);
@@ -159,7 +160,7 @@ function Cart() {
 
     const printWindow = window.open('', '_blank', 'width=900,height=700');
     if (!printWindow) {
-      alert('Please allow popups to print bill.');
+      toast.warn('Please allow popups to print bill.');
       return;
     }
 
@@ -221,39 +222,39 @@ function Cart() {
 
   const handleCheckout = async () => {
     if (!user) {
-      alert('Please login first');
+      toast.error('Please login first');
       navigate('/login');
       return;
     }
 
     if (user.role === 'seller') {
-      alert('Seller account can not place order');
+      toast.error('Seller account can not place order');
       return;
     }
 
     if (!shippingAddress.trim()) {
-      alert('Please enter shipping address');
+      toast.error('Please enter shipping address');
       return;
     }
 
     if (!customerName.trim()) {
-      alert('Please enter full name');
+      toast.error('Please enter full name');
       return;
     }
 
     if (!customerPhone.trim()) {
-      alert('Please enter phone number');
+      toast.error('Please enter phone number');
       return;
     }
 
     if (!/^\d{10}$/.test(customerPhone.trim())) {
-      alert('Please enter valid 10 digit phone number');
+      toast.error('Please enter valid 10 digit phone number');
       return;
     }
 
     if (paymentMethod === 'credit_card' || paymentMethod === 'debit_card') {
       if (!cardNumber.trim() || !cardHolder.trim() || !expiry.trim() || !cvv.trim()) {
-        alert('Please fill all card details');
+        toast.error('Please fill all card details');
         return;
       }
     }
@@ -287,9 +288,9 @@ function Cart() {
       setExpiry('');
       setCvv('');
       await loadMyOrders();
-      alert('Order placed successfully');
+      toast.success('Order placed successfully');
     } catch (err) {
-      alert(err.response?.data?.message || 'Checkout failed');
+      toast.error(err.response?.data?.message || 'Checkout failed');
     } finally {
       setCheckoutLoading(false);
     }
