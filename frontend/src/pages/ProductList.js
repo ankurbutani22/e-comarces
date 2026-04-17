@@ -120,14 +120,6 @@ function ProductList({
     );
   }
 
-  if (list.length === 0) {
-    return (
-      <div className="loading">
-        {searchQuery.trim() ? 'No products match your search' : 'No products available'}
-      </div>
-    );
-  }
-
   return (
     <div className="storefront-shell">
       <section className="home-carousel" aria-label="Featured products carousel">
@@ -207,11 +199,17 @@ function ProductList({
           ) : null}
         </div>
       </div>
-      <div className="product-grid">
-        {list.map((product) => (
-          <ProductCard key={product._id} product={product} />
-        ))}
-      </div>
+      {list.length > 0 ? (
+        <div className="product-grid">
+          {list.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
+      ) : (
+        <div className="loading">
+          {searchQuery.trim() ? 'No products match your search' : 'No products available'}
+        </div>
+      )}
     </div>
   );
 }
