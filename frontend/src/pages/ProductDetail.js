@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { createOrder } from '../services/authService';
+import { createOrder, getMyOrders, rateProduct } from '../services/authService';
 import { readLocalJson } from '../utils/storage';
 
 const MEDIA_PLACEHOLDER =
@@ -47,6 +47,9 @@ function ProductDetail() {
   const [buyCardHolder, setBuyCardHolder] = useState('');
   const [buyCardExpiry, setBuyCardExpiry] = useState('');
   const [buyCardCvv, setBuyCardCvv] = useState('');
+  const [hasOrderedProduct, setHasOrderedProduct] = useState(false);
+  const [ratingValue, setRatingValue] = useState(0);
+  const [ratingSaving, setRatingSaving] = useState(false);
   const basePrice = Number(product?.price || 0);
   const discountPercent = Math.min(95, Math.max(0, Number(product?.discountPercent || 0)));
   const discountedPrice = Math.max(0, Math.round(basePrice - (basePrice * discountPercent) / 100));
@@ -283,6 +286,34 @@ function ProductDetail() {
     fetchProductDetail();
   }, [fetchProductDetail]);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token') || '';
+
+    if (!token || !user || !id || user.role === 'seller') {
+      setHasOrderedProduct(false);
+      return;
+    }
+
+    const loadEligibility = async () => {
+      try {
+        const orderRes = await getMyOrders(token);
+        const orders = Array.isArray(orderRes?.data) ? orderRes.data : [];
+        const matchedOrder = orders.find(
+          (order) =>
+            order?.status !== 'cancelled' &&
+            Array.isArray(order?.items) &&
+            order.items.some((item) => String(item?.product) === String(id))
+        );
+
+        setHasOrderedProduct(Boolean(matchedOrder));
+      } catch (err) {
+        setHasOrderedProduct(false);
+      }
+    };
+
+    loadEligibility();
+  }, [id, user]);
+
   const allImages = useMemo(() => {
     if (!product) return [MEDIA_PLACEHOLDER];
 
@@ -327,6 +358,48 @@ function ProductDetail() {
     () => (Array.isArray(product?.customOptions) ? product.customOptions : []),
     [product]
   );
+
+  useEffect(() => {
+    if (!product || !user) {
+      setRatingValue(0);
+      return;
+    }
+
+    const reviews = Array.isArray(product.reviews) ? product.reviews : [];
+    const myReview = reviews.find((review) => String(review.user) === String(user._id || user.id));
+    setRatingValue(Number(myReview?.rating || 0));
+  }, [product, user]);
+
+  const submitRating = async () => {
+    const token = localStorage.getItem('token') || '';
+
+    if (!token || !user) {
+      alert('Please login to rate product');
+      navigate('/login');
+      return;
+    }
+
+    if (!hasOrderedProduct) {
+      alert('You can rate this product only after placing an order for it');
+      return;
+    }
+
+    if (ratingValue < 1 || ratingValue > 5) {
+      alert('Please select rating from 1 to 5');
+      return;
+    }
+
+    try {
+      setRatingSaving(true);
+      const ratingRes = await rateProduct(token, product._id, ratingValue);
+      setProduct(ratingRes?.data || product);
+      alert(ratingRes?.message || 'Rating saved successfully');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to save rating');
+    } finally {
+      setRatingSaving(false);
+    }
+  };
 
   const selectedVariant = useMemo(
     () => variantOptions.find((variant) => String(variant._id || variant.id) === String(selectedVariantId)) || null,
@@ -437,6 +510,38 @@ function ProductDetail() {
           <p className="detail-line">
             <strong>Rating:</strong> {product.ratings} ⭐ ({product.numReviews} reviews)
           </p>
+
+          <div className="selection-block">
+            <p className="selector-label">Your Rating</p>
+            <div className="chip-row rating-star-row">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={`rate-${star}`}
+                  type="button"
+                  className={`rating-star-btn ${ratingValue >= star ? 'active' : ''}`}
+                  onClick={() => setRatingValue(star)}
+                  disabled={!user || user?.role === 'seller'}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+
+            {!user ? <p className="selection-hint">Login કરો પછી rating આપી શકશો.</p> : null}
+            {user && user?.role === 'seller' ? <p className="selection-hint">Seller account થી rating આપી શકાતી નથી.</p> : null}
+            {user && user?.role !== 'seller' && !hasOrderedProduct ? (
+              <p className="selection-hint">Order કર્યા પછી જ આ product ને rating આપી શકશો.</p>
+            ) : null}
+
+            <button
+              type="button"
+              className="detail-rate-btn"
+              onClick={submitRating}
+              disabled={ratingSaving || !user || user?.role === 'seller' || !hasOrderedProduct}
+            >
+              {ratingSaving ? 'Saving...' : 'Submit Rating'}
+            </button>
+          </div>
 
           {sizeOptions.length > 0 ? (
             <div className="selection-block">

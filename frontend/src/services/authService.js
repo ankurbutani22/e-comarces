@@ -186,6 +186,20 @@ export const deleteSellerProduct = async (token, productId) => {
   return response.data;
 };
 
+export const rateProduct = async (token, productId, rating) => {
+  const response = await axios.post(
+    `/api/products/${productId}/rate`,
+    { rating },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  return response.data;
+};
+
 export const createOrder = async (token, payload) => {
   const response = await axios.post('/api/orders', payload, {
     headers: {

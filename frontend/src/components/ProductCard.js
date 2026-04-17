@@ -64,6 +64,9 @@ function ProductCard({ product }) {
               </>
             ) : null}
           </p>
+          <p className="product-rating-meta">
+            ⭐ {Number(product?.ratings || 0).toFixed(1)} • {Number(product?.numReviews || 0)} ratings • {Number(product?.ordersCount || 0)} orders
+          </p>
           <p className="product-stock">
             {product.stock > 0 ? `In Stock: ${product.stock}` : 'Out of Stock'}
           </p>

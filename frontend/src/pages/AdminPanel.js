@@ -264,9 +264,9 @@ function AdminPanel({ token }) {
             <tbody>
               {users.map((user) => (
                 <tr key={user._id}>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>
+                  <td data-label="Name">{user.name}</td>
+                  <td data-label="Email">{user.email}</td>
+                  <td data-label="Role">
                     <select
                       value={selectedRoles[user._id] || user.role}
                       onChange={(e) => onChangeRole(user._id, e.target.value)}
@@ -278,8 +278,8 @@ function AdminPanel({ token }) {
                       ))}
                     </select>
                   </td>
-                  <td>
-                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <td data-label="Actions">
+                    <div className="admin-action-row">
                       <button type="button" onClick={() => saveRole(user._id)}>Save Role</button>
                       <button type="button" className="danger-btn" onClick={() => removeUser(user._id)}>
                         Delete
@@ -311,11 +311,11 @@ function AdminPanel({ token }) {
             <tbody>
               {products.map((product) => (
                 <tr key={product._id}>
-                  <td>{product.name}</td>
-                  <td>{product.category}</td>
-                  <td>Rs. {product.price}</td>
-                  <td>{product.stock}</td>
-                  <td>{product.seller?.name || product.seller?.email || 'Unknown'}</td>
+                  <td data-label="Name">{product.name}</td>
+                  <td data-label="Category">{product.category}</td>
+                  <td data-label="Price">Rs. {product.price}</td>
+                  <td data-label="Stock">{product.stock}</td>
+                  <td data-label="Seller">{product.seller?.name || product.seller?.email || 'Unknown'}</td>
                 </tr>
               ))}
             </tbody>
@@ -341,11 +341,11 @@ function AdminPanel({ token }) {
             <tbody>
               {orders.map((order) => (
                 <tr key={order._id}>
-                  <td>{order._id.slice(-8)}</td>
-                  <td>{order.customerName || order.user?.name || 'User'}</td>
-                  <td>Rs. {order.totalAmount}</td>
-                  <td>{order.status}</td>
-                  <td>{new Date(order.createdAt).toLocaleString()}</td>
+                  <td data-label="Order ID">{order._id.slice(-8)}</td>
+                  <td data-label="Customer">{order.customerName || order.user?.name || 'User'}</td>
+                  <td data-label="Total">Rs. {order.totalAmount}</td>
+                  <td data-label="Status">{order.status}</td>
+                  <td data-label="Created">{new Date(order.createdAt).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -357,7 +357,7 @@ function AdminPanel({ token }) {
       {activeSection === 'ads' ? (
       <section className="panel-page">
         <h3>Ads Management</h3>
-        <div style={{ display: 'grid', gap: '0.75rem', marginBottom: '1rem' }}>
+        <div className="admin-ads-form">
           <input
             type="text"
             name="image"
@@ -370,7 +370,7 @@ function AdminPanel({ token }) {
             accept="image/*"
             onChange={(e) => setAdImageFile(e.target.files?.[0] || null)}
           />
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <label className="admin-checkbox-row">
             <input
               type="checkbox"
               name="isActive"
@@ -379,7 +379,7 @@ function AdminPanel({ token }) {
             />
             Active
           </label>
-          <div>
+          <div className="admin-submit-row">
             <button type="button" onClick={addAd} disabled={adSubmitting}>
               {adSubmitting ? 'Saving...' : 'Add Ad'}
             </button>
@@ -398,16 +398,16 @@ function AdminPanel({ token }) {
             <tbody>
               {ads.map((ad) => (
                 <tr key={ad._id}>
-                  <td>
+                  <td data-label="Image">
                     <img
                       src={ad.image}
                       alt={ad.title || 'Ad'}
-                      style={{ width: '120px', height: '68px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #d9e3f1' }}
+                      className="admin-ad-thumb"
                     />
                   </td>
-                  <td>{ad.isActive ? 'Active' : 'Inactive'}</td>
-                  <td>
-                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <td data-label="Status">{ad.isActive ? 'Active' : 'Inactive'}</td>
+                  <td data-label="Actions">
+                    <div className="admin-action-row">
                       <button type="button" onClick={() => toggleAdStatus(ad)}>
                         {ad.isActive ? 'Deactivate' : 'Activate'}
                       </button>

@@ -24,6 +24,13 @@ const getEffectiveProductPrice = (product) => {
   return Math.max(0, Math.round(basePrice - (basePrice * discountPercent) / 100));
 };
 
+const getFeaturedScore = (product) => {
+  const reviewCount = Number(product?.numReviews || 0);
+  const ordersCount = Number(product?.ordersCount || 0);
+  const rating = Number(product?.ratings || 0);
+  return reviewCount * 10000 + ordersCount * 100 + rating;
+};
+
 function App() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,7 +72,9 @@ function App() {
       });
     }
 
-    if (sortBy === 'price-low') {
+    if (sortBy === 'featured') {
+      nextProducts.sort((left, right) => getFeaturedScore(right) - getFeaturedScore(left));
+    } else if (sortBy === 'price-low') {
       nextProducts.sort((left, right) => getEffectiveProductPrice(left) - getEffectiveProductPrice(right));
     } else if (sortBy === 'price-high') {
       nextProducts.sort((left, right) => getEffectiveProductPrice(right) - getEffectiveProductPrice(left));

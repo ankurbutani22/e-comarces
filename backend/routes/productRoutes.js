@@ -4,6 +4,7 @@ const {
   getMyProducts,
   getAllProducts,
   getProductById,
+  rateProduct,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -18,6 +19,9 @@ router.get('/my-products', protect, authorize('seller', 'admin'), getMyProducts)
 
 // Get all products
 router.get('/', getAllProducts);
+
+// Rate product (allowed only for users who have ordered)
+router.post('/:id/rate', protect, authorize('user', 'admin'), rateProduct);
 
 // Get single product
 router.get('/:id', getProductById);
