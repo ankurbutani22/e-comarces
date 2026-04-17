@@ -96,6 +96,15 @@ function ProductList({
     setActiveSlide((prev) => (prev + 1) % carouselSlides.length);
   };
 
+  const getSlideByOffset = (offset) => {
+    if (carouselSlides.length === 0) return null;
+    const index = (activeSlide + offset + carouselSlides.length) % carouselSlides.length;
+    return carouselSlides[index] || null;
+  };
+
+  const leftCardSlide = getSlideByOffset(1);
+  const rightCardSlide = getSlideByOffset(2);
+
   if (loading) {
     return <div className="loading">Loading products...</div>;
   }
@@ -112,40 +121,54 @@ function ProductList({
   return (
     <div className="storefront-shell">
       {carouselSlides.length > 0 ? (
-        <section className="home-carousel" aria-label="Featured ads carousel">
-          <div className="home-carousel-track" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
-            {carouselSlides.map((slide, index) => (
-              <article className="home-carousel-slide" key={`${slide.image}-${index}`}>
-                <img src={slide.image} alt={slide.title} className="home-carousel-image" />
-                <div className="home-carousel-overlay">
-                  <p className="home-carousel-kicker">{slide.companyName || 'Featured'}</p>
-                  <h3>{slide.title}</h3>
-                  <p>{slide.subtitle}</p>
+        <section className="home-ad-showcase" aria-label="Featured ads showcase">
+          {carouselSlides.length > 2 ? (
+            <article className="home-side-ad-card left" aria-hidden="true">
+              <img src={leftCardSlide?.image} alt={leftCardSlide?.title || 'Ad'} className="home-side-ad-image" />
+            </article>
+          ) : null}
+
+          <div className="home-carousel home-carousel-main">
+            <div className="home-carousel-track" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
+              {carouselSlides.map((slide, index) => (
+                <article className="home-carousel-slide" key={`${slide.image}-${index}`}>
+                  <img src={slide.image} alt={slide.title} className="home-carousel-image" />
+                  <div className="home-carousel-overlay">
+                    <p className="home-carousel-kicker">{slide.companyName || 'Featured'}</p>
+                    <h3>{slide.title}</h3>
+                    <p>{slide.subtitle}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            {carouselSlides.length > 1 ? (
+              <>
+                <button type="button" className="home-carousel-btn prev" onClick={goToPrevSlide} aria-label="Previous slide">
+                  ‹
+                </button>
+                <button type="button" className="home-carousel-btn next" onClick={goToNextSlide} aria-label="Next slide">
+                  ›
+                </button>
+                <div className="home-carousel-dots">
+                  {carouselSlides.map((_, index) => (
+                    <button
+                      key={`dot-${index}`}
+                      type="button"
+                      className={`home-carousel-dot ${activeSlide === index ? 'active' : ''}`}
+                      onClick={() => setActiveSlide(index)}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
                 </div>
-              </article>
-            ))}
+              </>
+            ) : null}
           </div>
 
-          {carouselSlides.length > 1 ? (
-            <>
-              <button type="button" className="home-carousel-btn prev" onClick={goToPrevSlide} aria-label="Previous slide">
-                ‹
-              </button>
-              <button type="button" className="home-carousel-btn next" onClick={goToNextSlide} aria-label="Next slide">
-                ›
-              </button>
-              <div className="home-carousel-dots">
-                {carouselSlides.map((_, index) => (
-                  <button
-                    key={`dot-${index}`}
-                    type="button"
-                    className={`home-carousel-dot ${activeSlide === index ? 'active' : ''}`}
-                    onClick={() => setActiveSlide(index)}
-                    aria-label={`Go to slide ${index + 1}`}
-                  />
-                ))}
-              </div>
-            </>
+          {carouselSlides.length > 2 ? (
+            <article className="home-side-ad-card right" aria-hidden="true">
+              <img src={rightCardSlide?.image} alt={rightCardSlide?.title || 'Ad'} className="home-side-ad-image" />
+            </article>
           ) : null}
         </section>
       ) : null}
