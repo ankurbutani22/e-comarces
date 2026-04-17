@@ -145,6 +145,22 @@ function AdminPanel({ token }) {
     }));
   };
 
+  const onAdImageFileChange = (e) => {
+    const nextFile = e.target.files?.[0] || null;
+    setAdImageFile(nextFile);
+
+    if (nextFile) {
+      setAdForm((prev) => ({
+        ...prev,
+        image: ''
+      }));
+    }
+  };
+
+  const clearAdImageFile = () => {
+    setAdImageFile(null);
+  };
+
   const addAd = async () => {
     setError('');
     setSuccess('');
@@ -380,18 +396,41 @@ function AdminPanel({ token }) {
         <div className="admin-ads-layout">
           <div className="admin-ads-form-card">
             <div className="admin-ads-form">
+              <label className="admin-field-label" htmlFor="admin-ad-image-url">Ad Image URL</label>
               <input
+                id="admin-ad-image-url"
                 type="text"
                 name="image"
                 placeholder="Ad image URL (optional if uploading file)"
                 value={adForm.image}
                 onChange={onAdFormChange}
               />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setAdImageFile(e.target.files?.[0] || null)}
-              />
+
+              <p className="admin-upload-divider">OR</p>
+
+              <div className="admin-upload-box">
+                <input
+                  id="admin-ad-image-file"
+                  type="file"
+                  accept="image/*"
+                  className="admin-file-input"
+                  onChange={onAdImageFileChange}
+                />
+                <label htmlFor="admin-ad-image-file" className="admin-file-trigger">
+                  <span>Upload Ad Image</span>
+                  <small>JPG, PNG, WEBP</small>
+                </label>
+
+                {adImageFile ? (
+                  <div className="admin-file-chip">
+                    <span>{adImageFile.name}</span>
+                    <button type="button" className="admin-file-remove" onClick={clearAdImageFile}>
+                      Remove
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+
               <label className="admin-checkbox-row">
                 <input
                   type="checkbox"
