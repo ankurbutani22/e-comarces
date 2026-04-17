@@ -64,8 +64,8 @@ function ProductList({
       .filter((ad) => ad?.image)
       .map((ad) => ({
         image: resolveMediaUrl(ad.image),
-        title: ad.productName || ad.title || 'Featured Offer',
-        subtitle: ad.content || ad.subtitle || 'Latest updates from admin',
+        title: ad.productName || ad.title || '',
+        subtitle: ad.content || ad.subtitle || '',
         companyName: ad.companyName || ''
       }))
       .filter((ad) => ad.image)
@@ -132,12 +132,14 @@ function ProductList({
             <div className="home-carousel-track" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
               {carouselSlides.map((slide, index) => (
                 <article className="home-carousel-slide" key={`${slide.image}-${index}`}>
-                  <img src={slide.image} alt={slide.title} className="home-carousel-image" />
-                  <div className="home-carousel-overlay">
-                    <p className="home-carousel-kicker">{slide.companyName || 'Featured'}</p>
-                    <h3>{slide.title}</h3>
-                    <p>{slide.subtitle}</p>
-                  </div>
+                  <img src={slide.image} alt={slide.title || 'Ad banner'} className="home-carousel-image" />
+                  {(slide.companyName || slide.title || slide.subtitle) ? (
+                    <div className="home-carousel-overlay">
+                      {slide.companyName ? <p className="home-carousel-kicker">{slide.companyName}</p> : null}
+                      {slide.title ? <h3>{slide.title}</h3> : null}
+                      {slide.subtitle ? <p>{slide.subtitle}</p> : null}
+                    </div>
+                  ) : null}
                 </article>
               ))}
             </div>
