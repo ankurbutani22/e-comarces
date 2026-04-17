@@ -459,7 +459,6 @@ function AdminPanel({ token }) {
                       style={{ width: '120px', height: '68px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #d9e3f1' }}
                     />
                   </td>
-                  <td>{ad.title || '-'}</td>
                   <td>{ad.companyName || '-'}</td>
                   <td>{ad.productName || ad.title || '-'}</td>
                   <td>{ad.content || ad.subtitle || '-'}</td>

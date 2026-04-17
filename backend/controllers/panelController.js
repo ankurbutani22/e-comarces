@@ -195,10 +195,17 @@ exports.getAdminOrders = async (req, res) => {
 
 exports.getPublicAds = async (req, res) => {
   try {
-    const ads = await Ad.find({ isActive: true })
+    let ads = await Ad.find({ isActive: true })
       .sort({ sortOrder: 1, createdAt: -1 })
       .limit(12)
       .select('-createdBy');
+
+    if (ads.length === 0) {
+      ads = await Ad.find()
+        .sort({ sortOrder: 1, createdAt: -1 })
+        .limit(12)
+        .select('-createdBy');
+    }
 
     res.status(200).json({
       success: true,

@@ -25,6 +25,11 @@ const resolveMediaUrl = (value) => {
   if (!value || typeof value !== 'string') return '';
   if (/^https?:\/\//i.test(value)) return value;
 
+  const localhostUploadMatch = String(value).match(/^https?:\/\/localhost(?::\d+)?(\/uploads\/.*)$/i);
+  if (localhostUploadMatch?.[1]) {
+    return `${API_ORIGIN}${localhostUploadMatch[1]}`;
+  }
+
   const normalizedPath = value.startsWith('/') ? value : `/${value}`;
   if (normalizedPath.startsWith('/uploads/')) {
     return `${API_ORIGIN}${normalizedPath}`;
