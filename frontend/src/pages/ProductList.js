@@ -88,14 +88,6 @@ function ProductList({
     return () => window.clearInterval(timer);
   }, [carouselSlides.length]);
 
-  const goToPrevSlide = () => {
-    setActiveSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
-  };
-
-  const goToNextSlide = () => {
-    setActiveSlide((prev) => (prev + 1) % carouselSlides.length);
-  };
-
   const getSlideByOffset = (offset) => {
     if (carouselSlides.length === 0) return null;
     const index = (activeSlide + offset + carouselSlides.length) % carouselSlides.length;
@@ -148,25 +140,17 @@ function ProductList({
             </div>
 
             {carouselSlides.length > 1 ? (
-              <>
-                <button type="button" className="home-carousel-btn prev" onClick={goToPrevSlide} aria-label="Previous slide">
-                  ‹
-                </button>
-                <button type="button" className="home-carousel-btn next" onClick={goToNextSlide} aria-label="Next slide">
-                  ›
-                </button>
-                <div className="home-carousel-dots">
-                  {carouselSlides.map((_, index) => (
-                    <button
-                      key={`dot-${index}`}
-                      type="button"
-                      className={`home-carousel-dot ${activeSlide === index ? 'active' : ''}`}
-                      onClick={() => setActiveSlide(index)}
-                      aria-label={`Go to slide ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              </>
+              <div className="home-carousel-dots">
+                {carouselSlides.map((_, index) => (
+                  <button
+                    key={`dot-${index}`}
+                    type="button"
+                    className={`home-carousel-dot ${activeSlide === index ? 'active' : ''}`}
+                    onClick={() => setActiveSlide(index)}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
             ) : null}
           </div>
 

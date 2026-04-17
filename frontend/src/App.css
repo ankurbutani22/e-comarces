@@ -872,7 +872,7 @@ button:hover {
 
 .home-ad-showcase {
   display: grid;
-  grid-template-columns: minmax(150px, 0.9fr) minmax(0, 2.1fr) minmax(150px, 0.9fr);
+  grid-template-columns: minmax(170px, 0.9fr) minmax(360px, 1.65fr) minmax(260px, 1.35fr);
   gap: 0.9rem;
   align-items: stretch;
   margin: 0.2rem 0.9rem 1rem;
@@ -899,6 +899,14 @@ button:hover {
   min-height: 100%;
 }
 
+.home-side-ad-card.left {
+  aspect-ratio: 1 / 1;
+}
+
+.home-side-ad-card.right {
+  aspect-ratio: 16 / 9;
+}
+
 .home-side-ad-image {
   width: 100%;
   height: 100%;
@@ -914,7 +922,7 @@ button:hover {
 .home-carousel-slide {
   min-width: 100%;
   position: relative;
-  aspect-ratio: 16 / 6.2;
+  aspect-ratio: 16 / 9;
   background: #dbe7f2;
 }
 
@@ -1006,8 +1014,18 @@ button:hover {
 }
 
 .home-carousel-dot.active {
-  width: 20px;
+  width: 18px;
   background: #fff;
+}
+
+@media (max-width: 1100px) {
+  .home-ad-showcase.has-side-ads {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .home-ad-showcase.has-side-ads .home-side-ad-card {
+    display: none;
+  }
 }
 
 .product-toolbar-shell {
