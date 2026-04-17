@@ -4075,7 +4075,7 @@ select:focus,
   display: flex;
   align-items: flex-start;
   margin: 0;
-  padding: 0.78rem 0.92rem 0.84rem;
+  padding: 0.78rem 2.55rem 0.84rem 0.92rem;
   font-family: 'Space Grotesk', 'Sora', sans-serif;
   font-size: 0.915rem;
   font-weight: 600;
@@ -4086,20 +4086,31 @@ select:focus,
 .app-toast .Toastify__toast-icon {
   margin-inline-end: 0.62rem;
   margin-top: 0.02rem;
+  flex-shrink: 0;
 }
 
 .app-toast .Toastify__close-button {
-  position: relative;
+  position: absolute;
+  top: 10px;
+  right: 10px;
   z-index: 1;
-  align-self: center;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(15, 52, 77, 0.08);
   opacity: 0.62;
   color: inherit;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 
 .app-toast .Toastify__close-button:hover {
   opacity: 1;
-  transform: scale(1.05);
+  background: rgba(15, 52, 77, 0.16);
 }
 
 .Toastify__toast--success.app-toast {
@@ -4177,7 +4188,7 @@ select:focus,
   }
 
   .app-toast-body {
-    padding: 0.72rem 0.82rem 0.78rem;
+    padding: 0.72rem 2.35rem 0.78rem 0.82rem;
     font-size: 0.89rem;
   }
 }
