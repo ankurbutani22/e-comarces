@@ -411,6 +411,7 @@ function AdminPanel({ token }) {
                     id="admin-ad-image-url"
                     type="text"
                     name="image"
+                    className="admin-url-input"
                     placeholder="https://example.com/ad-banner.jpg"
                     value={adForm.image}
                     onChange={onAdFormChange}
