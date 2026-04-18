@@ -29,10 +29,6 @@ function SellerPanel({ token, onProductAdded }) {
   const [variantImageFiles, setVariantImageFiles] = useState({});
   const [sizes, setSizes] = useState([]);
   const [sizeInput, setSizeInput] = useState('');
-  const [ramSizes, setRamSizes] = useState([]);
-  const [ramSizeInput, setRamSizeInput] = useState('');
-  const [romSizes, setRomSizes] = useState([]);
-  const [romSizeInput, setRomSizeInput] = useState('');
   const [customOptions, setCustomOptions] = useState([]);
   const [customOptionInput, setCustomOptionInput] = useState('');
   const [customOptionPriceInput, setCustomOptionPriceInput] = useState('');
@@ -126,12 +122,6 @@ function SellerPanel({ token, onProductAdded }) {
         setSizes([]);
         setSizeInput('');
       }
-      if (value !== 'Mobile') {
-        setRamSizes([]);
-        setRamSizeInput('');
-        setRomSizes([]);
-        setRomSizeInput('');
-      }
     }
 
     setForm({
@@ -184,30 +174,6 @@ function SellerPanel({ token, onProductAdded }) {
 
   const removeSize = (sizeToRemove) => {
     setSizes(sizes.filter(s => s !== sizeToRemove));
-  };
-
-  const addRamSize = () => {
-    const normalizedValue = ramSizeInput.trim().toUpperCase();
-    if (normalizedValue && !ramSizes.includes(normalizedValue)) {
-      setRamSizes([...ramSizes, normalizedValue]);
-      setRamSizeInput('');
-    }
-  };
-
-  const removeRamSize = (ramToRemove) => {
-    setRamSizes(ramSizes.filter(ram => ram !== ramToRemove));
-  };
-
-  const addRomSize = () => {
-    const normalizedValue = romSizeInput.trim().toUpperCase();
-    if (normalizedValue && !romSizes.includes(normalizedValue)) {
-      setRomSizes([...romSizes, normalizedValue]);
-      setRomSizeInput('');
-    }
-  };
-
-  const removeRomSize = (romToRemove) => {
-    setRomSizes(romSizes.filter(rom => rom !== romToRemove));
   };
 
   const getCustomOptionName = (option) => (typeof option === 'string' ? option : String(option?.name || ''));
@@ -328,8 +294,6 @@ function SellerPanel({ token, onProductAdded }) {
           images: v.images || []
         })) || undefined,
         sizes: form.category === 'Clothing' ? sizes : undefined,
-        ramSizes: form.category === 'Mobile' ? ramSizes : undefined,
-        romSizes: form.category === 'Mobile' ? romSizes : undefined,
         customOptions: customOptions.length > 0
           ? customOptions.map((option) => ({
               name: getCustomOptionName(option),
@@ -358,10 +322,6 @@ function SellerPanel({ token, onProductAdded }) {
       setVariants([]);
       setSizes([]);
       setSizeInput('');
-      setRamSizes([]);
-      setRamSizeInput('');
-      setRomSizes([]);
-      setRomSizeInput('');
       setCustomOptions([]);
       setCustomOptionInput('');
       setCustomOptionPriceInput('');
@@ -750,53 +710,6 @@ function SellerPanel({ token, onProductAdded }) {
                       <span key={size} className="size-chip">
                         {size}
                         <button type="button" onClick={() => removeSize(size)}>×</button>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {form.category === 'Mobile' && (
-                <div className="field-span-2 sizes-section">
-                  <label>Mobile Storage Options</label>
-                  <div className="size-input-group" style={{ marginBottom: '0.75rem' }}>
-                    <input
-                      type="text"
-                      placeholder="RAM: e.g., 4GB, 6GB, 8GB"
-                      value={ramSizeInput}
-                      onChange={(e) => setRamSizeInput(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addRamSize())}
-                    />
-                    <button type="button" className="ghost-btn" onClick={addRamSize}>
-                      Add RAM
-                    </button>
-                  </div>
-                  <div className="size-chips">
-                    {ramSizes.map((ram) => (
-                      <span key={ram} className="size-chip">
-                        {ram}
-                        <button type="button" onClick={() => removeRamSize(ram)}>×</button>
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="size-input-group" style={{ marginTop: '0.9rem' }}>
-                    <input
-                      type="text"
-                      placeholder="ROM: e.g., 64GB, 128GB, 256GB"
-                      value={romSizeInput}
-                      onChange={(e) => setRomSizeInput(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addRomSize())}
-                    />
-                    <button type="button" className="ghost-btn" onClick={addRomSize}>
-                      Add ROM
-                    </button>
-                  </div>
-                  <div className="size-chips">
-                    {romSizes.map((rom) => (
-                      <span key={rom} className="size-chip">
-                        {rom}
-                        <button type="button" onClick={() => removeRomSize(rom)}>×</button>
                       </span>
                     ))}
                   </div>
