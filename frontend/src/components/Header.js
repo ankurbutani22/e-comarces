@@ -114,7 +114,7 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
             <img src={logo} alt="Apna Bazaar Logo" className="brand-logo" />
           </Link>
 
-          <nav className="header-nav">
+          <nav className={`header-nav ${user?.role ? `header-nav-${user.role}` : ''}`}>
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
