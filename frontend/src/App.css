@@ -4998,6 +4998,137 @@ select:focus,
   }
 }
 
+/* Mobile conflict fixes: header menu + carousel */
+@media (max-width: 768px) {
+  .app-header.mobile-menu-open .header-nav {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    padding: 0.55rem;
+    border: 1px solid rgba(223, 239, 250, 0.16);
+    border-radius: 14px;
+    background: rgba(7, 27, 41, 0.2);
+  }
+
+  .app-header.mobile-menu-open .header-nav-link {
+    min-height: 44px;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    padding: 0.42rem 0.58rem;
+  }
+
+  .app-header.mobile-menu-open .header-actions {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.55rem;
+    border: 1px solid rgba(223, 239, 250, 0.16);
+    border-radius: 14px;
+    background: rgba(7, 27, 41, 0.2);
+  }
+
+  .app-header.mobile-menu-open .header-actions > * {
+    flex: 1 1 calc(50% - 0.5rem);
+    min-width: 120px;
+  }
+
+  .app-header.mobile-menu-open .notification-wrap,
+  .app-header.mobile-menu-open .header-search-wrap {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+
+  .app-header.mobile-menu-open .mobile-menu-toggle span:first-child {
+    transform: rotate(-45deg) translateY(7px);
+  }
+
+  .app-header.mobile-menu-open .mobile-menu-toggle span:last-child {
+    transform: rotate(45deg) translateY(-7px);
+  }
+
+  .home-carousel,
+  .home-ad-grid-carousel {
+    margin: 0.1rem 0.2rem 0.85rem;
+    border-radius: 16px;
+  }
+
+  .home-carousel-slide {
+    aspect-ratio: 16 / 10;
+  }
+
+  .home-carousel-overlay {
+    padding: 0.62rem 0.7rem 0.88rem;
+    background: linear-gradient(180deg, rgba(5, 23, 37, 0.1) 0%, rgba(7, 30, 50, 0.82) 100%);
+  }
+
+  .home-carousel-overlay h3 {
+    font-size: 1.02rem;
+    line-height: 1.15;
+  }
+
+  .home-carousel-overlay p {
+    font-size: 0.78rem;
+    line-height: 1.3;
+  }
+
+  .home-carousel-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 1.05rem;
+  }
+
+  .home-carousel-btn.prev {
+    left: 0.45rem;
+  }
+
+  .home-carousel-btn.next {
+    right: 0.45rem;
+  }
+
+  .home-carousel-dots {
+    bottom: 0.42rem;
+    gap: 0.3rem;
+  }
+
+  .home-carousel-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .home-carousel-dot.active {
+    width: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .app-header.mobile-menu-open .header-nav {
+    grid-template-columns: 1fr;
+  }
+
+  .app-header.mobile-menu-open .header-actions > * {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+
+  .home-carousel,
+  .home-ad-grid-carousel {
+    margin: 0 0 0.72rem;
+    border-radius: 14px;
+  }
+
+  .home-carousel-slide {
+    aspect-ratio: 5 / 4;
+  }
+
+  .home-carousel-overlay h3 {
+    font-size: 0.96rem;
+  }
+
+  .home-carousel-overlay p {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .app-toast,
   .app-toast .Toastify__close-button {
