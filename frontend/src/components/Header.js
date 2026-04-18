@@ -18,6 +18,7 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const notificationRef = useRef(null);
 
   useEffect(() => {
@@ -31,6 +32,10 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
     document.addEventListener('mousedown', handleOutside);
     return () => document.removeEventListener('mousedown', handleOutside);
   }, []);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
     const loadNotifications = async () => {
@@ -107,12 +112,24 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
       ];
 
   return (
-    <header className="app-header">
+    <header className={`app-header ${mobileMenuOpen ? 'mobile-menu-open' : ''}`}>
       <div className="header-inner">
         <div className="header-top-row">
           <Link to="/" className="brand-link">
             <img src={logo} alt="Apna Bazaar Logo" className="brand-logo" />
           </Link>
+
+          <button
+            type="button"
+            className="mobile-menu-toggle"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
 
           <nav className={`header-nav ${user?.role ? `header-nav-${user.role}` : ''}`}>
             {navItems.map((item) => (
@@ -120,6 +137,7 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
                 key={item.to}
                 to={item.to}
                 end={item.to === '/'}
+                onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) => {
                   const active = user?.role === 'seller' && item.tab
                     ? location.pathname === '/seller' && location.search === `?tab=${item.tab}`
@@ -208,11 +226,11 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
               </Link>
             ) : null}
 
-            {!user ? <Link to="/login" className="auth-link">Login</Link> : null}
-            {!user ? <Link to="/register" className="auth-link primary">Register</Link> : null}
+            {!user ? <Link to="/login" className="auth-link" onClick={() => setMobileMenuOpen(false)}>Login</Link> : null}
+            {!user ? <Link to="/register" className="auth-link primary" onClick={() => setMobileMenuOpen(false)}>Register</Link> : null}
 
             {user ? (
-              <button type="button" onClick={onLogout} className="link-button logout-btn">
+              <button type="button" onClick={() => { setMobileMenuOpen(false); onLogout(); }} className="link-button logout-btn">
                 Logout
               </button>
             ) : null}
