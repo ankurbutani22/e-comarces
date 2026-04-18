@@ -18,13 +18,15 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const notificationRef = useRef(null);
+  const profileMenuRef = useRef(null);
 
   useEffect(() => {
     const handleOutside = (event) => {
-      if (!notificationRef.current) return;
-      if (!notificationRef.current.contains(event.target)) {
+      if (!profileMenuRef.current) return;
+      if (!profileMenuRef.current.contains(event.target)) {
+        setProfileMenuOpen(false);
         setNotificationsOpen(false);
       }
     };
@@ -35,6 +37,8 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
 
   useEffect(() => {
     setMobileMenuOpen(false);
+    setProfileMenuOpen(false);
+    setNotificationsOpen(false);
   }, [location.pathname, location.search]);
 
   useEffect(() => {
@@ -86,30 +90,72 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
     setNotificationsOpen((prev) => !prev);
   };
 
+  const handleToggleProfileMenu = () => {
+    setProfileMenuOpen((prev) => {
+      if (prev) {
+        setNotificationsOpen(false);
+      }
+      return !prev;
+    });
+  };
+
+  const closeAllMenus = () => {
+    setMobileMenuOpen(false);
+    setProfileMenuOpen(false);
+    setNotificationsOpen(false);
+  };
+
   const showSearch = location.pathname === '/';
   const navItems = isAdmin
     ? [
-        { to: '/admin?tab=home', label: 'Dashboard', tab: 'home' },
-        { to: '/admin?tab=ads', label: 'Ads', tab: 'ads' },
-        { to: '/admin?tab=users', label: 'Users', tab: 'users' },
-        { to: '/admin?tab=products', label: 'Products', tab: 'products' },
-        { to: '/admin?tab=orders', label: 'Orders', tab: 'orders' }
+        { to: '/admin?tab=home', label: 'Dashboard', tab: 'home', icon: 'dashboard' },
+        { to: '/admin?tab=ads', label: 'Ads', tab: 'ads', icon: 'ads' },
+        { to: '/admin?tab=users', label: 'Users', tab: 'users', icon: 'users' },
+        { to: '/admin?tab=products', label: 'Products', tab: 'products', icon: 'products' },
+        { to: '/admin?tab=orders', label: 'Orders', tab: 'orders', icon: 'orders' }
       ]
     : user?.role === 'seller'
     ? [
-        { to: '/seller?tab=dashboard', label: 'Seller Dashboard', tab: 'dashboard' },
-        { to: '/seller?tab=my-products', label: 'My Products', tab: 'my-products' },
-        { to: '/seller?tab=add-products', label: 'Add Products', tab: 'add-products' },
-        { to: '/seller?tab=all-orders', label: 'All Orders', tab: 'all-orders' },
-        { to: '/seller/scan', label: 'QR Scan', tab: 'scan' }
+        { to: '/seller?tab=dashboard', label: 'Dashboard', tab: 'dashboard', icon: 'dashboard' },
+        { to: '/seller?tab=my-products', label: 'Products', tab: 'my-products', icon: 'products' },
+        { to: '/seller?tab=add-products', label: 'Add', tab: 'add-products', icon: 'add' },
+        { to: '/seller?tab=all-orders', label: 'Orders', tab: 'all-orders', icon: 'orders' },
+        { to: '/seller/scan', label: 'Scan', tab: 'scan', icon: 'scan' }
       ]
     : [
-        { to: '/', label: 'Home' },
-        ...(canUseCart ? [{ to: '/cart', label: 'Cart' }] : []),
-        ...(canSeeOrders ? [{ to: '/orders', label: 'My Orders' }] : []),
-        ...(canUseScanner ? [{ to: '/seller/scan', label: 'QR Scanner' }] : []),
-        ...(canUseDeliveryPanel ? [{ to: '/delivery', label: 'Delivery Panel' }] : [])
+        { to: '/', label: 'Home', icon: 'home' },
+        ...(canUseCart ? [{ to: '/cart', label: 'Cart', icon: 'cart' }] : []),
+        ...(canSeeOrders ? [{ to: '/orders', label: 'Orders', icon: 'orders' }] : []),
+        ...(canUseScanner ? [{ to: '/seller/scan', label: 'Scan', icon: 'scan' }] : []),
+        ...(canUseDeliveryPanel ? [{ to: '/delivery', label: 'Delivery', icon: 'delivery' }] : [])
       ];
+
+  const renderNavIcon = (icon) => {
+    switch (icon) {
+      case 'home':
+        return <path d="M3 11.5L12 4l9 7.5V20a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1v-8.5z" fill="currentColor" />;
+      case 'cart':
+        return <path d="M3 5h2l2 10h10l2-7H8" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />;
+      case 'orders':
+        return <path d="M6 4h12v16H6zM9 8h6M9 12h6M9 16h4" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" />;
+      case 'scan':
+        return <path d="M7 4H4v3M17 4h3v3M4 17v3h3M20 17v3h-3M8 12h8" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" />;
+      case 'delivery':
+        return <path d="M4 8h10v8H4zM14 10h3l3 3v3h-6zM7 18a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM17 18a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" fill="currentColor" />;
+      case 'dashboard':
+        return <path d="M4 4h7v7H4zM13 4h7v4h-7zM13 10h7v10h-7zM4 13h7v7H4z" fill="currentColor" />;
+      case 'users':
+        return <path d="M9 11a3 3 0 100-6 3 3 0 000 6zm6 1a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM4 20a5 5 0 0110 0M13 20a4 4 0 018 0" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" />;
+      case 'products':
+        return <path d="M4 7l8-4 8 4-8 4-8-4zm0 5l8 4 8-4M4 12v5l8 4 8-4v-5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinejoin="round" />;
+      case 'ads':
+        return <path d="M4 12l12-5v10L4 12zm12-2h3a2 2 0 010 4h-3" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" />;
+      case 'add':
+        return <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />;
+      default:
+        return <circle cx="12" cy="12" r="4" fill="currentColor" />;
+    }
+  };
 
   return (
     <header className={`app-header ${mobileMenuOpen ? 'mobile-menu-open' : ''}`}>
@@ -137,7 +183,7 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
                 key={item.to}
                 to={item.to}
                 end={item.to === '/'}
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={closeAllMenus}
                 className={({ isActive }) => {
                   const active = user?.role === 'seller' && item.tab
                     ? location.pathname === '/seller' && location.search === `?tab=${item.tab}`
@@ -148,63 +194,98 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
                   return `header-nav-link${active ? ' active' : ''}`;
                 }}
               >
-                {item.label}
+                <span className="header-nav-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    {renderNavIcon(item.icon)}
+                  </svg>
+                </span>
+                <span className="header-nav-text">{item.label}</span>
               </NavLink>
             ))}
           </nav>
 
           <div className="header-actions">
             {user ? (
-              <div className="notification-wrap" ref={notificationRef}>
+              <div className="profile-menu-wrap" ref={profileMenuRef}>
                 <button
                   type="button"
-                  className="nav-icon-btn"
-                  aria-label="Notifications"
-                  title="Notifications"
-                  onClick={handleOpenNotifications}
+                  className="nav-avatar-btn profile-toggle-btn"
+                  aria-label="My Profile"
+                  title="My Profile"
+                  aria-expanded={profileMenuOpen}
+                  onClick={handleToggleProfileMenu}
                 >
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 3a5 5 0 00-5 5v2.9c0 .6-.2 1.2-.57 1.67L5 14.5h14l-1.43-1.93a2.8 2.8 0 01-.57-1.67V8a5 5 0 00-5-5z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M9.5 17a2.5 2.5 0 005 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-                </svg>
-                {unreadCount > 0 ? <span className="icon-dot" /> : null}
+                  <img
+                    src={profileImageSrc}
+                    alt={user?.name || 'Profile'}
+                    className="nav-avatar-img"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = PROFILE_PLACEHOLDER;
+                    }}
+                  />
                 </button>
 
-                {notificationsOpen ? (
-                  <div className="notification-panel">
-                    <div className="notification-head">
-                      <strong>Notifications</strong>
-                      {unreadCount > 0 ? <span>{unreadCount} new</span> : null}
-                    </div>
+                {profileMenuOpen ? (
+                  <div className="profile-menu-panel">
+                    <Link to="/profile" className="profile-menu-item" onClick={closeAllMenus}>
+                      My Profile
+                    </Link>
 
-                    {notificationsLoading ? <p className="notification-empty">Loading...</p> : null}
+                    <button type="button" className="profile-menu-item" onClick={handleOpenNotifications}>
+                      Notifications
+                      {unreadCount > 0 ? <span className="profile-menu-badge">{unreadCount}</span> : null}
+                    </button>
 
-                    {!notificationsLoading && notifications.length === 0 ? (
-                      <p className="notification-empty">No notifications yet.</p>
-                    ) : null}
+                    <button
+                      type="button"
+                      className="profile-menu-item danger"
+                      onClick={() => {
+                        closeAllMenus();
+                        onLogout();
+                      }}
+                    >
+                      Logout
+                    </button>
 
-                    {!notificationsLoading && notifications.length > 0 ? (
-                      <div className="notification-list">
-                        {notifications.map((item) => (
-                          <button
-                            type="button"
-                            key={item.id}
-                            className="notification-item"
-                            onClick={() => {
-                              setNotificationsOpen(false);
-                              if (user?.role === 'user') {
-                                navigate('/orders');
-                              } else if (user?.role === 'delivery_boy') {
-                                navigate('/delivery');
-                              } else {
-                                navigate('/seller');
-                              }
-                            }}
-                          >
-                            <p>{item.title}</p>
-                            <span>{item.subTitle}</span>
-                          </button>
-                        ))}
+                    {notificationsOpen ? (
+                      <div className="notification-panel profile-notification-panel">
+                        <div className="notification-head">
+                          <strong>Notifications</strong>
+                          {unreadCount > 0 ? <span>{unreadCount} new</span> : null}
+                        </div>
+
+                        {notificationsLoading ? <p className="notification-empty">Loading...</p> : null}
+
+                        {!notificationsLoading && notifications.length === 0 ? (
+                          <p className="notification-empty">No notifications yet.</p>
+                        ) : null}
+
+                        {!notificationsLoading && notifications.length > 0 ? (
+                          <div className="notification-list">
+                            {notifications.map((item) => (
+                              <button
+                                type="button"
+                                key={item.id}
+                                className="notification-item"
+                                onClick={() => {
+                                  setNotificationsOpen(false);
+                                  setProfileMenuOpen(false);
+                                  if (user?.role === 'user') {
+                                    navigate('/orders');
+                                  } else if (user?.role === 'delivery_boy') {
+                                    navigate('/delivery');
+                                  } else {
+                                    navigate('/seller');
+                                  }
+                                }}
+                              >
+                                <p>{item.title}</p>
+                                <span>{item.subTitle}</span>
+                              </button>
+                            ))}
+                          </div>
+                        ) : null}
                       </div>
                     ) : null}
                   </div>
@@ -212,28 +293,8 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
               </div>
             ) : null}
 
-            {user ? (
-              <Link to="/profile" className="nav-avatar-btn" aria-label="My Profile" title="My Profile">
-                <img
-                  src={profileImageSrc}
-                  alt={user?.name || 'Profile'}
-                  className="nav-avatar-img"
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = PROFILE_PLACEHOLDER;
-                  }}
-                />
-              </Link>
-            ) : null}
-
-            {!user ? <Link to="/login" className="auth-link" onClick={() => setMobileMenuOpen(false)}>Login</Link> : null}
-            {!user ? <Link to="/register" className="auth-link primary" onClick={() => setMobileMenuOpen(false)}>Register</Link> : null}
-
-            {user ? (
-              <button type="button" onClick={() => { setMobileMenuOpen(false); onLogout(); }} className="link-button logout-btn">
-                Logout
-              </button>
-            ) : null}
+            {!user ? <Link to="/login" className="auth-link" onClick={closeAllMenus}>Login</Link> : null}
+            {!user ? <Link to="/register" className="auth-link primary" onClick={closeAllMenus}>Register</Link> : null}
           </div>
         </div>
 

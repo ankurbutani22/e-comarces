@@ -321,6 +321,86 @@ input.header-search-input::-webkit-search-decoration {
   justify-content: flex-end;
 }
 
+.profile-menu-wrap {
+  position: relative;
+}
+
+.profile-menu-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.4rem);
+  width: 220px;
+  border-radius: 14px;
+  border: 1px solid #d4e1ec;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.2);
+  padding: 0.45rem;
+  display: grid;
+  gap: 0.35rem;
+  z-index: 260;
+}
+
+.profile-menu-item {
+  width: 100%;
+  border: 1px solid #d7e3ee;
+  border-radius: 10px;
+  background: #fff;
+  color: #17384d;
+  text-align: left;
+  padding: 0.58rem 0.65rem;
+  font-size: 0.86rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  box-shadow: none;
+}
+
+.profile-menu-item.danger {
+  color: #7f1d1d;
+  border-color: #efc5c5;
+  background: #fff7f7;
+}
+
+.profile-menu-badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #f59e0b;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.profile-notification-panel {
+  position: static;
+  width: 100%;
+  box-shadow: none;
+  border-radius: 10px;
+}
+
+.header-nav-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-nav-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.header-nav-text {
+  line-height: 1;
+}
+
 .notification-wrap {
   position: relative;
 }
@@ -5275,5 +5355,120 @@ select:focus,
 
   .home-carousel-overlay p {
     display: none;
+  }
+}
+
+/* Mobile bottom nav + profile menu final behavior */
+@media (max-width: 768px) {
+  .main-content {
+    padding-bottom: 88px;
+  }
+
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+
+  .header-top-row {
+    border-bottom: none;
+    padding-bottom: 0.2rem;
+  }
+
+  .header-actions {
+    display: inline-flex !important;
+    margin-left: auto;
+    gap: 0.4rem;
+  }
+
+  .header-actions .auth-link,
+  .header-actions .link-button.logout-btn {
+    display: none;
+  }
+
+  .app-header .header-nav,
+  .app-header.mobile-menu-open .header-nav {
+    display: grid !important;
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: 8px;
+    z-index: 320;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.35rem;
+    padding: 0.45rem;
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(14, 39, 56, 0.94) 0%, rgba(26, 70, 92, 0.94) 100%);
+    border: 1px solid rgba(209, 230, 245, 0.2);
+    box-shadow: 0 18px 34px rgba(14, 39, 56, 0.34);
+  }
+
+  .header-nav-link,
+  .app-header.mobile-menu-open .header-nav-link {
+    min-height: 56px !important;
+    border-radius: 12px !important;
+    padding: 0.35rem 0.2rem !important;
+    display: grid;
+    gap: 0.22rem;
+    justify-items: center !important;
+    align-content: center;
+    text-align: center !important;
+    font-size: 0.68rem !important;
+    line-height: 1.1;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .header-nav-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .header-nav-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .header-bottom-row {
+    width: 100%;
+    padding-top: 0.1rem;
+  }
+
+  .header-search-wrap {
+    width: 100%;
+  }
+
+  .profile-menu-panel {
+    right: 0;
+    left: auto;
+    width: min(260px, calc(100vw - 28px));
+  }
+
+  .profile-notification-panel {
+    max-height: 250px;
+    overflow: hidden;
+  }
+
+  .profile-notification-panel .notification-list {
+    max-height: 175px;
+  }
+}
+
+@media (max-width: 576px) {
+  .main-content {
+    padding-bottom: 84px;
+  }
+
+  .app-header .header-nav,
+  .app-header.mobile-menu-open .header-nav {
+    left: 8px;
+    right: 8px;
+    bottom: 6px;
+    padding: 0.38rem;
+    border-radius: 14px;
+  }
+
+  .header-nav-link,
+  .app-header.mobile-menu-open .header-nav-link {
+    min-height: 52px !important;
+    font-size: 0.64rem !important;
   }
 }
