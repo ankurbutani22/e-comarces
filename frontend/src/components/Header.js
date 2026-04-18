@@ -20,12 +20,12 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
   const [notifications, setNotifications] = useState([]);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const profileMenuRef = useRef(null);
+  const headerControlsRef = useRef(null);
 
   useEffect(() => {
     const handleOutside = (event) => {
-      if (!profileMenuRef.current) return;
-      if (!profileMenuRef.current.contains(event.target)) {
+      if (!headerControlsRef.current) return;
+      if (!headerControlsRef.current.contains(event.target)) {
         setProfileMenuOpen(false);
         setNotificationsOpen(false);
       }
@@ -87,14 +87,13 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
   );
 
   const handleOpenNotifications = () => {
+    setProfileMenuOpen(false);
     setNotificationsOpen((prev) => !prev);
   };
 
   const handleToggleProfileMenu = () => {
+    setNotificationsOpen(false);
     setProfileMenuOpen((prev) => {
-      if (prev) {
-        setNotificationsOpen(false);
-      }
       return !prev;
     });
   };
@@ -130,6 +129,7 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
         ...(canUseDeliveryPanel ? [{ to: '/delivery', label: 'Delivery', icon: 'delivery' }] : [])
       ];
   const mobileNavCountClass = `mobile-nav-count-${Math.min(Math.max(navItems.length, 1), 5)}`;
+  const roleLabel = user?.role ? user.role.replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase()) : '';
 
   const renderNavIcon = (icon) => {
     switch (icon) {
@@ -222,90 +222,121 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
 
           <div className="header-actions">
             {user ? (
-              <div className="profile-menu-wrap" ref={profileMenuRef}>
-                <button
-                  type="button"
-                  className="nav-avatar-btn profile-toggle-btn"
-                  aria-label="My Profile"
-                  title="My Profile"
-                  aria-expanded={profileMenuOpen}
-                  onClick={handleToggleProfileMenu}
-                >
-                  <img
-                    src={profileImageSrc}
-                    alt={user?.name || 'Profile'}
-                    className="nav-avatar-img"
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = PROFILE_PLACEHOLDER;
-                    }}
-                  />
-                </button>
+              <div className="header-user-controls" ref={headerControlsRef}>
+                <div className="notification-wrap">
+                  <button
+                    type="button"
+                    className="nav-icon-btn notification-btn"
+                    aria-label="Notifications"
+                    title="Notifications"
+                    aria-expanded={notificationsOpen}
+                    onClick={handleOpenNotifications}
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 4a5 5 0 00-5 5v2.5c0 .9-.34 1.77-.96 2.43L4.6 15.4a1 1 0 00.7 1.7h13.4a1 1 0 00.7-1.7l-1.44-1.47a3.5 3.5 0 01-.96-2.43V9a5 5 0 00-5-5zm0 17a2.5 2.5 0 002.45-2h-4.9A2.5 2.5 0 0012 21z" fill="currentColor" />
+                    </svg>
+                    {unreadCount > 0 ? <span className="nav-icon-badge">{unreadCount > 9 ? '9+' : unreadCount}</span> : null}
+                  </button>
 
-                {profileMenuOpen ? (
-                  <div className="profile-menu-panel">
-                    <Link to="/profile" className="profile-menu-item" onClick={closeAllMenus}>
-                      My Profile
-                    </Link>
-
-                    <button type="button" className="profile-menu-item" onClick={handleOpenNotifications}>
-                      Notifications
-                      {unreadCount > 0 ? <span className="profile-menu-badge">{unreadCount}</span> : null}
-                    </button>
-
-                    <button
-                      type="button"
-                      className="profile-menu-item danger"
-                      onClick={() => {
-                        closeAllMenus();
-                        onLogout();
-                      }}
-                    >
-                      Logout
-                    </button>
-
-                    {notificationsOpen ? (
-                      <div className="notification-panel profile-notification-panel">
-                        <div className="notification-head">
-                          <strong>Notifications</strong>
-                          {unreadCount > 0 ? <span>{unreadCount} new</span> : null}
-                        </div>
-
-                        {notificationsLoading ? <p className="notification-empty">Loading...</p> : null}
-
-                        {!notificationsLoading && notifications.length === 0 ? (
-                          <p className="notification-empty">No notifications yet.</p>
-                        ) : null}
-
-                        {!notificationsLoading && notifications.length > 0 ? (
-                          <div className="notification-list">
-                            {notifications.map((item) => (
-                              <button
-                                type="button"
-                                key={item.id}
-                                className="notification-item"
-                                onClick={() => {
-                                  setNotificationsOpen(false);
-                                  setProfileMenuOpen(false);
-                                  if (user?.role === 'user') {
-                                    navigate('/orders');
-                                  } else if (user?.role === 'delivery_boy') {
-                                    navigate('/delivery');
-                                  } else {
-                                    navigate('/seller');
-                                  }
-                                }}
-                              >
-                                <p>{item.title}</p>
-                                <span>{item.subTitle}</span>
-                              </button>
-                            ))}
-                          </div>
-                        ) : null}
+                  {notificationsOpen ? (
+                    <div className="notification-panel">
+                      <div className="notification-head">
+                        <strong>Notifications</strong>
+                        {unreadCount > 0 ? <span>{unreadCount} new</span> : null}
                       </div>
-                    ) : null}
-                  </div>
-                ) : null}
+
+                      {notificationsLoading ? <p className="notification-empty">Loading...</p> : null}
+
+                      {!notificationsLoading && notifications.length === 0 ? (
+                        <p className="notification-empty">No notifications yet.</p>
+                      ) : null}
+
+                      {!notificationsLoading && notifications.length > 0 ? (
+                        <div className="notification-list">
+                          {notifications.map((item) => (
+                            <button
+                              type="button"
+                              key={item.id}
+                              className="notification-item"
+                              onClick={() => {
+                                setNotificationsOpen(false);
+                                if (user?.role === 'user') {
+                                  navigate('/orders');
+                                } else if (user?.role === 'delivery_boy') {
+                                  navigate('/delivery');
+                                } else {
+                                  navigate('/seller');
+                                }
+                              }}
+                            >
+                              <p>{item.title}</p>
+                              <span>{item.subTitle}</span>
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </div>
+
+                <div className="profile-menu-wrap">
+                  <button
+                    type="button"
+                    className="profile-trigger-btn"
+                    aria-label="My Profile"
+                    title="My Profile"
+                    aria-expanded={profileMenuOpen}
+                    onClick={handleToggleProfileMenu}
+                  >
+                    <span className="profile-trigger-avatar" aria-hidden="true">
+                      <img
+                        src={profileImageSrc}
+                        alt={user?.name || 'Profile'}
+                        className="nav-avatar-img"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = PROFILE_PLACEHOLDER;
+                        }}
+                      />
+                    </span>
+                    <span className="profile-trigger-label">My Profile</span>
+                  </button>
+
+                  {profileMenuOpen ? (
+                    <div className="profile-menu-panel">
+                      <div className="profile-menu-head">
+                        <img
+                          src={profileImageSrc}
+                          alt={user?.name || 'Profile'}
+                          className="profile-menu-avatar"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = PROFILE_PLACEHOLDER;
+                          }}
+                        />
+                        <div>
+                          <strong>{user?.name || 'User'}</strong>
+                          <span>{roleLabel || 'Member'}</span>
+                        </div>
+                      </div>
+
+                      <Link to="/profile" className="profile-menu-item" onClick={closeAllMenus}>
+                        View Profile Details
+                      </Link>
+
+                      <button
+                        type="button"
+                        className="profile-menu-item danger"
+                        onClick={() => {
+                          closeAllMenus();
+                          onLogout();
+                        }}
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
               </div>
             ) : null}
 
