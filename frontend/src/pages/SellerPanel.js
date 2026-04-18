@@ -7,8 +7,7 @@ import {
   getSellerOrders,
   getSellerPanel,
   updateSellerOrderStatus,
-  uploadSellerMedia,
-  updateSellerProduct
+  uploadSellerMedia
 } from '../services/authService';
 
 function SellerPanel({ token, onProductAdded }) {
@@ -364,115 +363,6 @@ function SellerPanel({ token, onProductAdded }) {
     }
   };
 
-  const changeStock = async (product, delta) => {
-    const nextStock = Math.max(0, Number(product.stock) + delta);
-    setError('');
-    setSuccess('');
-    setActionLoadingId(product._id);
-
-    try {
-      await updateSellerProduct(token, product._id, { stock: nextStock });
-      await refreshProducts();
-      setSuccess('Stock updated');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Stock update failed');
-    } finally {
-      setActionLoadingId('');
-    }
-  };
-
-  const markPrice = async (product, type) => {
-    const currentPrice = Number(product.price);
-    const nextPrice = type === 'up'
-      ? Math.round(currentPrice * 1.05)
-      : Math.max(1, Math.round(currentPrice * 0.95));
-
-    setError('');
-    setSuccess('');
-    setActionLoadingId(product._id);
-
-    try {
-      await updateSellerProduct(token, product._id, { price: nextPrice });
-      await refreshProducts();
-      setSuccess('Price updated');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Price update failed');
-    } finally {
-      setActionLoadingId('');
-    }
-  };
-
-  const editProduct = async (product) => {
-    const allowedCategories = ['Electronics', 'Clothing', 'Mobile', 'Cosmetic', 'Novelty', 'Books', 'Home', 'Sports', 'Other'];
-
-    const name = window.prompt('Product name:', product.name || '');
-    if (name === null) return;
-
-    const description = window.prompt('Description:', product.description || '');
-    if (description === null) return;
-
-    const priceText = window.prompt('Price (Rs.):', String(product.price || 0));
-    if (priceText === null) return;
-
-    const stockText = window.prompt('Stock:', String(product.stock || 0));
-    if (stockText === null) return;
-
-    const discountText = window.prompt('Discount % (0-95):', String(product.discountPercent || 0));
-    if (discountText === null) return;
-
-    const categoryText = window.prompt(
-      `Category (${allowedCategories.join(', ')}):`,
-      product.category || 'Electronics'
-    );
-    if (categoryText === null) return;
-
-    const nextPrice = Number(priceText);
-    const nextStock = Number(stockText);
-    const nextDiscount = Number(discountText);
-    const nextCategory = String(categoryText).trim();
-
-    if (!Number.isFinite(nextPrice) || nextPrice < 0) {
-      setError('Invalid price value');
-      return;
-    }
-
-    if (!Number.isFinite(nextStock) || nextStock < 0) {
-      setError('Invalid stock value');
-      return;
-    }
-
-    if (!Number.isFinite(nextDiscount) || nextDiscount < 0 || nextDiscount > 95) {
-      setError('Discount must be between 0 and 95');
-      return;
-    }
-
-    if (!allowedCategories.includes(nextCategory)) {
-      setError('Invalid category value');
-      return;
-    }
-
-    setError('');
-    setSuccess('');
-    setActionLoadingId(product._id);
-
-    try {
-      await updateSellerProduct(token, product._id, {
-        name: String(name).trim(),
-        description: String(description).trim(),
-        price: nextPrice,
-        stock: nextStock,
-        discountPercent: nextDiscount,
-        category: nextCategory
-      });
-      await refreshProducts();
-      setSuccess('Product updated');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Product update failed');
-    } finally {
-      setActionLoadingId('');
-    }
-  };
-
   const removeProduct = async (productId) => {
     setError('');
     setSuccess('');
@@ -737,8 +627,9 @@ function SellerPanel({ token, onProductAdded }) {
                       <p><strong>Category:</strong> {product.category}</p>
                       <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '0.5rem' }}>{product.description?.substring(0, 100)}...</p>
                       <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-                        <button type="button" onClick={() => setActiveTab('add-products')} className="ghost-btn">Edit</button>
-                        <button type="button" onClick={() => deleteSellerProduct(token, product._id).then(() => refreshProducts()).catch(err => toast.error(err.response?.data?.message || 'Error deleting product'))} className="danger-btn">Delete</button>
+                        <button type="button" onClick={() => removeProduct(product._id)} className="danger-btn" disabled={actionLoadingId === product._id}>
+                          Delete
+                        </button>
                       </div>
                     </article>
                   ))}
