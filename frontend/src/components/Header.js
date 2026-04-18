@@ -171,7 +171,7 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
   };
 
   return (
-    <header className={`app-header ${mobileMenuOpen ? 'mobile-menu-open' : ''}`}>
+    <header className={`app-header ${mobileMenuOpen ? 'mobile-menu-open' : ''} ${user ? 'has-user' : 'is-guest'}`}>
       <div className="header-inner">
         <div className="header-top-row">
           <Link to="/" className="brand-link">
