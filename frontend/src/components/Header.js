@@ -157,6 +157,18 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
     }
   };
 
+  const getNavBadge = (item) => {
+    if (!user || unreadCount <= 0) {
+      return null;
+    }
+
+    if (item.icon === 'orders' || item.icon === 'delivery') {
+      return unreadCount > 9 ? '9+' : String(unreadCount);
+    }
+
+    return null;
+  };
+
   return (
     <header className={`app-header ${mobileMenuOpen ? 'mobile-menu-open' : ''}`}>
       <div className="header-inner">
@@ -177,7 +189,10 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
             <span />
           </button>
 
-          <nav className={`header-nav ${user?.role ? `header-nav-${user.role}` : ''}`}>
+          <nav
+            className={`header-nav ${user?.role ? `header-nav-${user.role}` : ''}`}
+            style={{ '--mobile-nav-count': navItems.length }}
+          >
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
@@ -198,6 +213,7 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
                   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     {renderNavIcon(item.icon)}
                   </svg>
+                  {getNavBadge(item) ? <span className="header-nav-badge">{getNavBadge(item)}</span> : null}
                 </span>
                 <span className="header-nav-text">{item.label}</span>
               </NavLink>
