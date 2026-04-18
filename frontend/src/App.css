@@ -86,6 +86,14 @@ body {
   min-width: 0;
 }
 
+.brand-logo {
+  display: block;
+  width: auto;
+  height: 46px;
+  max-width: 180px;
+  object-fit: contain;
+}
+
 .brand-mark {
   width: 34px;
   height: 34px;
@@ -2463,6 +2471,104 @@ button:hover {
   padding-top: 1rem;
 }
 
+.seller-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.seller-metric-card {
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+}
+
+.seller-metric-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.seller-metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.seller-metric-success {
+  color: #10b981;
+}
+
+.seller-metric-warning {
+  color: #f59e0b;
+}
+
+.seller-metric-primary {
+  color: #3b82f6;
+}
+
+.seller-empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.seller-text-link-btn {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.seller-product-thumb {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.seller-product-description {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.seller-product-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.seller-info-inline {
+  margin-top: 0.4rem;
+}
+
+.seller-size-presets {
+  margin-top: 0.6rem;
+}
+
+.seller-order-qr-wrap {
+  margin: 0.5rem 0;
+}
+
+.seller-order-qr-image {
+  width: 96px;
+  height: 96px;
+  border: 1px solid #ddd;
+  padding: 4px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.seller-scan-btn {
+  margin-top: 0.8rem;
+}
+
 .seller-products-grid {
   margin-top: 0.8rem;
   display: grid;
@@ -3569,6 +3675,76 @@ select,
   .buy-card-inline {
     grid-template-columns: 1fr;
   }
+
+  .cart-shell .cart-table-wrap {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .cart-shell .cart-table,
+  .cart-shell .cart-table tbody,
+  .cart-shell .cart-table tr,
+  .cart-shell .cart-table td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .cart-shell .cart-table {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .cart-shell .cart-table thead {
+    display: none;
+  }
+
+  .cart-shell .cart-table tbody {
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .cart-shell .cart-table tr {
+    background: #fff;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    padding: 0.55rem 0.65rem;
+    box-shadow: 0 8px 18px rgba(25, 45, 65, 0.08);
+  }
+
+  .cart-shell .cart-table td {
+    border: none;
+    border-bottom: 1px dashed #e2e8f0;
+    padding: 0.5rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.8rem;
+    font-size: 0.86rem;
+  }
+
+  .cart-shell .cart-table td:last-child {
+    border-bottom: none;
+  }
+
+  .cart-shell .cart-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #334155;
+    min-width: 82px;
+    flex-shrink: 0;
+  }
+
+  .cart-shell .cart-table td .cart-qty-input {
+    margin-left: auto;
+  }
+
+  .cart-shell .cart-table td button {
+    width: 100%;
+    max-width: 180px;
+  }
 }
 
 @media (max-width: 576px) {
@@ -3583,6 +3759,11 @@ select,
 
   .brand-text {
     font-size: 0.94rem;
+  }
+
+  .brand-logo {
+    height: 38px;
+    max-width: 150px;
   }
 
   .brand-mark {
@@ -3714,10 +3895,6 @@ select,
     margin-top: 0.5rem;
   }
 
-  .cart-table {
-    min-width: 620px;
-  }
-
   .order-item-row,
   .tracking-event-item,
   .delivery-card-head,
@@ -3729,6 +3906,18 @@ select,
 
   .seller-hero-copy-wrap h2 {
     font-size: 1.5rem;
+  }
+
+  .seller-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .seller-metric-value {
+    font-size: 1.65rem;
+  }
+
+  .seller-product-thumb {
+    height: 170px;
   }
 
   .delivery-feature-strip {
@@ -3810,6 +3999,15 @@ select,
     padding: 0.42rem 0.72rem;
   }
 
+  .seller-product-actions {
+    flex-direction: column;
+  }
+
+  .seller-order-qr-image {
+    width: 88px;
+    height: 88px;
+  }
+
   .auth-card,
   .modern-auth-card,
   .checkout-card,
@@ -3825,6 +4023,11 @@ select,
 
   .seller-actions {
     grid-template-columns: 1fr;
+  }
+
+  .brand-logo {
+    height: 34px;
+    max-width: 132px;
   }
 }
 

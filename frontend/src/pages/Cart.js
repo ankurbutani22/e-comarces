@@ -321,7 +321,7 @@ function Cart() {
             <tbody>
               {cartItems.map(item => (
                 <tr key={item.cartKey || item._id}>
-                  <td>
+                  <td data-label="Product">
                     <p className="cart-item-name">{item.name}</p>
                     {item.selectedSize ? <p className="cart-item-meta">Size: {item.selectedSize}</p> : null}
                     {item.selectedRamSize ? <p className="cart-item-meta">RAM: {item.selectedRamSize}</p> : null}
@@ -329,8 +329,8 @@ function Cart() {
                     {item.selectedCustomOption ? <p className="cart-item-meta">Option: {item.selectedCustomOption}</p> : null}
                     {item.selectedVariantName ? <p className="cart-item-meta">Design: {item.selectedVariantName}</p> : null}
                   </td>
-                  <td className="cart-center">₹{item.price}</td>
-                  <td className="cart-center">
+                  <td className="cart-center" data-label="Price">₹{item.price}</td>
+                  <td className="cart-center" data-label="Quantity">
                     <input
                       type="number"
                       min="1"
@@ -339,10 +339,10 @@ function Cart() {
                       className="cart-qty-input"
                     />
                   </td>
-                  <td className="cart-center cart-amount">
+                  <td className="cart-center cart-amount" data-label="Total">
                     ₹{item.price * item.quantity}
                   </td>
-                  <td className="cart-center">
+                  <td className="cart-center" data-label="Action">
                     <button
                       onClick={() => removeItem(item.cartKey || item._id)}
                       className="cart-remove-btn"

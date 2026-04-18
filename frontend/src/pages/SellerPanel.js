@@ -541,26 +541,26 @@ function SellerPanel({ token, onProductAdded }) {
                 <p className="section-kicker">Overview</p>
                 <h3>Dashboard</h3>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
-                <div style={{ padding: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#f9fafb' }}>
-                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Total Products</p>
-                  <h4 style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937' }}>{stats.products}</h4>
+              <div className="seller-metrics-grid">
+                <div className="seller-metric-card">
+                  <p className="seller-metric-label">Total Products</p>
+                  <h4 className="seller-metric-value">{stats.products}</h4>
                 </div>
-                <div style={{ padding: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#f9fafb' }}>
-                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Total Orders</p>
-                  <h4 style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937' }}>{stats.orders}</h4>
+                <div className="seller-metric-card">
+                  <p className="seller-metric-label">Total Orders</p>
+                  <h4 className="seller-metric-value">{stats.orders}</h4>
                 </div>
-                <div style={{ padding: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#f9fafb' }}>
-                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Completed</p>
-                  <h4 style={{ fontSize: '2rem', fontWeight: '700', color: '#10b981' }}>{completedOrders}</h4>
+                <div className="seller-metric-card">
+                  <p className="seller-metric-label">Completed</p>
+                  <h4 className="seller-metric-value seller-metric-success">{completedOrders}</h4>
                 </div>
-                <div style={{ padding: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#f9fafb' }}>
-                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Pending</p>
-                  <h4 style={{ fontSize: '2rem', fontWeight: '700', color: '#f59e0b' }}>{pendingOrders}</h4>
+                <div className="seller-metric-card">
+                  <p className="seller-metric-label">Pending</p>
+                  <h4 className="seller-metric-value seller-metric-warning">{pendingOrders}</h4>
                 </div>
-                <div style={{ padding: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#f9fafb' }}>
-                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Total Revenue</p>
-                  <h4 style={{ fontSize: '2rem', fontWeight: '700', color: '#3b82f6' }}>Rs. {totalRevenue}</h4>
+                <div className="seller-metric-card">
+                  <p className="seller-metric-label">Total Revenue</p>
+                  <h4 className="seller-metric-value seller-metric-primary">Rs. {totalRevenue}</h4>
                 </div>
               </div>
             </section>
@@ -575,7 +575,12 @@ function SellerPanel({ token, onProductAdded }) {
                 <h3>My Products</h3>
               </div>
               {myProducts.length === 0 ? (
-                <p style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>No products added yet. <button type="button" onClick={() => setTab('add-products')} style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', textDecoration: 'underline' }}>Create one now</button></p>
+                <p className="seller-empty-state">
+                  No products added yet.{' '}
+                  <button type="button" onClick={() => setTab('add-products')} className="seller-text-link-btn">
+                    Create one now
+                  </button>
+                </p>
               ) : (
                 <div className="seller-products-grid">
                   {myProducts.map((product) => (
@@ -583,13 +588,13 @@ function SellerPanel({ token, onProductAdded }) {
                       <div className="section-head compact">
                         <h4>{product.name}</h4>
                       </div>
-                      {product.image ? <img src={product.image} alt={product.name} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '6px', marginBottom: '1rem' }} /> : null}
+                      {product.image ? <img src={product.image} alt={product.name} className="seller-product-thumb" /> : null}
                       <p><strong>Price:</strong> Rs. {product.price}</p>
                       {product.discountPercent ? <p><strong>Discount:</strong> {product.discountPercent}%</p> : null}
                       <p><strong>Stock:</strong> {product.stock}</p>
                       <p><strong>Category:</strong> {product.category}</p>
-                      <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '0.5rem' }}>{product.description?.substring(0, 100)}...</p>
-                      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                      <p className="seller-product-description">{product.description?.substring(0, 100)}...</p>
+                      <div className="seller-product-actions">
                         <button type="button" onClick={() => removeProduct(product._id)} className="danger-btn" disabled={actionLoadingId === product._id}>
                           Delete
                         </button>
@@ -669,7 +674,7 @@ function SellerPanel({ token, onProductAdded }) {
                   value={form.discountPercent}
                   onChange={onChange}
                 />
-                <p className="info-text" style={{ marginTop: '0.4rem' }}>
+                <p className="info-text seller-info-inline">
                   Final selling price: Rs. {formDiscountedPrice}
                   {formDiscountPercent > 0 ? ` (MRP Rs. ${formBasePrice})` : ''}
                 </p>
@@ -748,7 +753,7 @@ function SellerPanel({ token, onProductAdded }) {
                   </button>
                 </div>
 
-                <div className="size-chips" style={{ marginTop: '0.6rem' }}>
+                <div className="size-chips seller-size-presets">
                   {(categoryOptionPresets[form.category] || []).map((option) => (
                     <button
                       type="button"
@@ -931,11 +936,11 @@ function SellerPanel({ token, onProductAdded }) {
                     <p>Address: {order.shippingAddress}</p>
                     <p>Payment: {formatPaymentMethod(order.paymentMethod)} ({order.paymentStatus})</p>
                     <p>Total For You: Rs. {order.sellerTotal}</p>
-                    <div style={{ margin: '0.5rem 0' }}>
+                    <div className="seller-order-qr-wrap">
                       <img
                         src={getOrderQrUrl(order)}
                         alt="Order QR Code"
-                        style={{ width: '96px', height: '96px', border: '1px solid #ddd', padding: '4px', borderRadius: '8px', background: '#fff' }}
+                        className="seller-order-qr-image"
                       />
                     </div>
                     <div className="order-items-list">
@@ -966,7 +971,7 @@ function SellerPanel({ token, onProductAdded }) {
         <p>
           Manage your seller store efficiently with our streamlined dashboard.
         </p>
-        <button type="button" onClick={() => window.location.assign('/seller/scan')} style={{ marginTop: '0.8rem' }}>
+        <button type="button" onClick={() => window.location.assign('/seller/scan')} className="seller-scan-btn">
           Open QR Scanner
         </button>
       </section>

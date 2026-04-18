@@ -111,7 +111,7 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
       <div className="header-inner">
         <div className="header-top-row">
           <Link to="/" className="brand-link">
-            <img src={logo} alt="Apna Bazaar Logo" className="brand-logo" style={{ height: '50px' }} />
+            <img src={logo} alt="Apna Bazaar Logo" className="brand-logo" />
           </Link>
 
           <nav className="header-nav">
