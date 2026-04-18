@@ -5847,3 +5847,14 @@ select:focus,
     min-height: 40px;
   }
 }
+
+/* Remove extra text lines near carousel on mobile */
+@media (max-width: 768px) {
+  .storefront-head {
+    display: none !important;
+  }
+
+  .product-toolbar-shell {
+    margin-top: 0.45rem !important;
+  }
+}
