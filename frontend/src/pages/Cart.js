@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { createOrder, getMyOrders, getProfile } from '../services/authService';
 import { readLocalJson } from '../utils/storage';
+import { API_ORIGIN } from '../config/api';
 
 const ORDER_ITEM_PLACEHOLDER =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><rect width="96" height="96" rx="12" fill="%23e5e7eb"/><rect x="20" y="22" width="56" height="50" rx="8" fill="%23ffffff" stroke="%23cbd5e1"/><circle cx="38" cy="42" r="6" fill="%2394a3b8"/><path d="M28 63l12-12 10 10 8-8 10 10" stroke="%2394a3b8" stroke-width="4" fill="none" stroke-linecap="round"/></svg>';
@@ -11,10 +12,14 @@ const resolveMediaUrl = (value) => {
   if (!value || typeof value !== 'string') return '';
   if (/^https?:\/\//i.test(value)) return value;
 
+  const localhostUploadMatch = String(value).match(/^https?:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?(\/uploads\/.*)$/i);
+  if (localhostUploadMatch?.[1]) {
+    return `${API_ORIGIN}${localhostUploadMatch[1]}`;
+  }
+
   const normalizedPath = value.startsWith('/') ? value : `/${value}`;
   if (normalizedPath.startsWith('/uploads/')) {
-    const backendOrigin = process.env.REACT_APP_API_ORIGIN || 'http://localhost:2205';
-    return `${backendOrigin}${normalizedPath}`;
+    return `${API_ORIGIN}${normalizedPath}`;
   }
 
   return normalizedPath;
