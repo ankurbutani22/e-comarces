@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
   createAdminAd,
@@ -16,6 +17,7 @@ import {
 } from '../services/authService';
 
 function AdminPanel({ token }) {
+  const location = useLocation();
   const [panelData, setPanelData] = useState(null);
   const [dashboard, setDashboard] = useState(null);
   const [users, setUsers] = useState([]);
@@ -23,7 +25,7 @@ function AdminPanel({ token }) {
   const [orders, setOrders] = useState([]);
   const [ads, setAds] = useState([]);
   const [selectedRoles, setSelectedRoles] = useState({});
-  const [activeSection, setActiveSection] = useState('home');
+  const [activeSection, setActiveSection] = useState(() => new URLSearchParams(location.search).get('tab') || 'home');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,13 +37,6 @@ function AdminPanel({ token }) {
   });
 
   const roleOptions = ['user', 'seller', 'delivery_boy', 'admin'];
-  const menuItems = [
-    { id: 'home', label: 'Home' },
-    { id: 'ads', label: 'Ads' },
-    { id: 'users', label: 'Users' },
-    { id: 'products', label: 'Products' },
-    { id: 'orders', label: 'Orders' }
-  ];
 
   const adPreviewUrl = useMemo(() => {
     if (adForm.image && String(adForm.image).trim()) {
@@ -112,6 +107,12 @@ function AdminPanel({ token }) {
       toast.success(success);
     }
   }, [success]);
+
+  useEffect(() => {
+    const currentTab = new URLSearchParams(location.search).get('tab') || 'home';
+    const allowedTabs = new Set(['home', 'ads', 'users', 'products', 'orders']);
+    setActiveSection(allowedTabs.has(currentTab) ? currentTab : 'home');
+  }, [location.search]);
 
   const onChangeRole = (userId, role) => {
     setSelectedRoles((prev) => ({
@@ -265,21 +266,6 @@ function AdminPanel({ token }) {
         <p className="admin-subtitle">Manage platform operations with a clean, high-visibility dashboard.</p>
         <div className="admin-role-pill">Role: {panelData.role}</div>
         {loading ? <p className="loading">Refreshing panel data...</p> : null}
-      </section>
-
-      <section className="panel-page admin-menu-wrap">
-        <div className="admin-menu-row" role="tablist" aria-label="Admin Sections">
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`admin-menu-btn ${activeSection === item.id ? 'active' : ''}`}
-              onClick={() => setActiveSection(item.id)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
       </section>
 
       {activeSection === 'home' ? (

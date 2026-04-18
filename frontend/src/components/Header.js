@@ -84,8 +84,11 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
   const showSearch = location.pathname === '/';
   const navItems = isAdmin
     ? [
-        { to: '/', label: 'Home' },
-        { to: '/admin', label: 'Admin Panel' }
+        { to: '/admin?tab=home', label: 'Dashboard', tab: 'home' },
+        { to: '/admin?tab=ads', label: 'Ads', tab: 'ads' },
+        { to: '/admin?tab=users', label: 'Users', tab: 'users' },
+        { to: '/admin?tab=products', label: 'Products', tab: 'products' },
+        { to: '/admin?tab=orders', label: 'Orders', tab: 'orders' }
       ]
     : user?.role === 'seller'
     ? [
@@ -120,6 +123,8 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
                 className={({ isActive }) => {
                   const active = user?.role === 'seller' && item.tab
                     ? location.pathname === '/seller' && location.search === `?tab=${item.tab}`
+                    : user?.role === 'admin' && item.tab
+                    ? location.pathname === '/admin' && (location.search === `?tab=${item.tab}` || (!location.search && item.tab === 'home'))
                     : isActive;
 
                   return `header-nav-link${active ? ' active' : ''}`;
