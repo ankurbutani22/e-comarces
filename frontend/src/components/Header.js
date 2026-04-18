@@ -129,6 +129,7 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
         ...(canUseScanner ? [{ to: '/seller/scan', label: 'Scan', icon: 'scan' }] : []),
         ...(canUseDeliveryPanel ? [{ to: '/delivery', label: 'Delivery', icon: 'delivery' }] : [])
       ];
+  const mobileNavCountClass = `mobile-nav-count-${Math.min(Math.max(navItems.length, 1), 5)}`;
 
   const renderNavIcon = (icon) => {
     switch (icon) {
@@ -190,8 +191,7 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
           </button>
 
           <nav
-            className={`header-nav ${user?.role ? `header-nav-${user.role}` : ''}`}
-            style={{ '--mobile-nav-count': navItems.length }}
+            className={`header-nav ${user?.role ? `header-nav-${user.role}` : ''} ${mobileNavCountClass}`}
           >
             {navItems.map((item) => (
               <NavLink

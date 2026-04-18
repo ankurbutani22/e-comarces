@@ -5412,7 +5412,7 @@ select:focus,
     right: 10px;
     bottom: 8px;
     z-index: 320;
-    grid-template-columns: repeat(var(--mobile-nav-count, 5), minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 0.35rem;
     padding: 0.45rem;
     border-radius: 16px;
@@ -5462,6 +5462,26 @@ select:focus,
 
   .header-nav-delivery_boy {
     background: linear-gradient(145deg, rgba(57, 36, 14, 0.94) 0%, rgba(121, 78, 24, 0.94) 100%) !important;
+  }
+
+  .header-nav.mobile-nav-count-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+
+  .header-nav.mobile-nav-count-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .header-nav.mobile-nav-count-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .header-nav.mobile-nav-count-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  .header-nav.mobile-nav-count-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
   }
 
   .header-nav-icon {
@@ -5518,5 +5538,20 @@ select:focus,
   .app-header.mobile-menu-open .header-nav-link {
     min-height: 52px !important;
     font-size: 0.64rem !important;
+  }
+}
+
+/* Hard fallback to prevent menu disappearance on mobile */
+@media (max-width: 768px) {
+  .app-header .header-nav {
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .app-header .header-nav-link {
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 }
