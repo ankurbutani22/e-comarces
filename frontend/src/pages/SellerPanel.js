@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
   createSellerProduct,
@@ -11,6 +12,8 @@ import {
 } from '../services/authService';
 
 function SellerPanel({ token, onProductAdded }) {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [panelData, setPanelData] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -32,7 +35,7 @@ function SellerPanel({ token, onProductAdded }) {
   const [romSizeInput, setRomSizeInput] = useState('');
   const [customOptions, setCustomOptions] = useState([]);
   const [customOptionInput, setCustomOptionInput] = useState('');
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(() => new URLSearchParams(location.search).get('tab') || 'dashboard');
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -80,6 +83,16 @@ function SellerPanel({ token, onProductAdded }) {
       toast.success(success);
     }
   }, [success]);
+
+  useEffect(() => {
+    const currentTab = new URLSearchParams(location.search).get('tab') || 'dashboard';
+    setActiveTab(currentTab);
+  }, [location.search]);
+
+  const setTab = (nextTab) => {
+    setActiveTab(nextTab);
+    navigate(`/seller?tab=${nextTab}`);
+  };
 
   const stats = useMemo(() => ({
     products: myProducts.length,
@@ -511,7 +524,7 @@ function SellerPanel({ token, onProductAdded }) {
         <nav className="seller-tabs" style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid #e5e7eb', marginBottom: '2rem', padding: '0 1rem' }}>
           <button
             type="button"
-            onClick={() => setActiveTab('dashboard')}
+            onClick={() => setTab('dashboard')}
             style={{
               padding: '0.75rem 1rem',
               background: activeTab === 'dashboard' ? '#3b82f6' : 'transparent',
@@ -526,7 +539,7 @@ function SellerPanel({ token, onProductAdded }) {
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('my-products')}
+            onClick={() => setTab('my-products')}
             style={{
               padding: '0.75rem 1rem',
               background: activeTab === 'my-products' ? '#3b82f6' : 'transparent',
@@ -541,7 +554,7 @@ function SellerPanel({ token, onProductAdded }) {
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('add-products')}
+            onClick={() => setTab('add-products')}
             style={{
               padding: '0.75rem 1rem',
               background: activeTab === 'add-products' ? '#3b82f6' : 'transparent',
@@ -556,7 +569,7 @@ function SellerPanel({ token, onProductAdded }) {
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('all-orders')}
+            onClick={() => setTab('all-orders')}
             style={{
               padding: '0.75rem 1rem',
               background: activeTab === 'all-orders' ? '#3b82f6' : 'transparent',
@@ -612,7 +625,7 @@ function SellerPanel({ token, onProductAdded }) {
                 <h3>My Products</h3>
               </div>
               {myProducts.length === 0 ? (
-                <p style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>No products added yet. <button type="button" onClick={() => setActiveTab('add-products')} style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', textDecoration: 'underline' }}>Create one now</button></p>
+                <p style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>No products added yet. <button type="button" onClick={() => setTab('add-products')} style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', textDecoration: 'underline' }}>Create one now</button></p>
               ) : (
                 <div className="seller-products-grid">
                   {myProducts.map((product) => (

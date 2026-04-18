@@ -89,11 +89,11 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
       ]
     : user?.role === 'seller'
     ? [
-        { to: '/seller', label: 'Seller Dashboard' },
-        { to: '/seller', label: 'My Products' },
-        { to: '/seller', label: 'Add Products' },
-        { to: '/seller', label: 'All Orders' },
-        { to: '/seller/scan', label: 'QR Scan' }
+        { to: '/seller?tab=dashboard', label: 'Seller Dashboard', tab: 'dashboard' },
+        { to: '/seller?tab=my-products', label: 'My Products', tab: 'my-products' },
+        { to: '/seller?tab=add-products', label: 'Add Products', tab: 'add-products' },
+        { to: '/seller?tab=all-orders', label: 'All Orders', tab: 'all-orders' },
+        { to: '/seller/scan', label: 'QR Scan', tab: 'scan' }
       ]
     : [
         { to: '/', label: 'Home' },
@@ -110,6 +110,25 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
           <Link to="/" className="brand-link">
             <img src={logo} alt="Apna Bazaar Logo" className="brand-logo" style={{ height: '50px' }} />
           </Link>
+
+          <nav className="header-nav">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === '/'}
+                className={({ isActive }) => {
+                  const active = user?.role === 'seller' && item.tab
+                    ? location.pathname === '/seller' && location.search === `?tab=${item.tab}`
+                    : isActive;
+
+                  return `header-nav-link${active ? ' active' : ''}`;
+                }}
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
 
           <div className="header-actions">
             {user ? (
@@ -196,19 +215,6 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
         </div>
 
         <div className="header-bottom-row">
-          <nav className="header-nav">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === '/'}
-                className={({ isActive }) => `header-nav-link${isActive ? ' active' : ''}`}
-              >
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
-
           {showSearch ? (
             <div className="header-search-wrap">
               <label className="header-search-label" htmlFor="home-search">
