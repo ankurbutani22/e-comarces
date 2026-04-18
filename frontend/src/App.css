@@ -5812,3 +5812,38 @@ select:focus,
     font-size: 0.6rem !important;
   }
 }
+
+/* Mobile searchbar under header bar */
+@media (max-width: 768px) {
+  .app-header .header-bottom-row {
+    width: 100% !important;
+    display: block !important;
+    margin-top: 0.15rem;
+    padding: 0.3rem 0 0;
+    border-top: 1px solid rgba(214, 232, 246, 0.22);
+  }
+
+  .app-header .header-search-wrap {
+    width: 100% !important;
+    max-width: none !important;
+    justify-self: stretch !important;
+    margin: 0;
+  }
+
+  .app-header .header-search-box {
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-header .header-bottom-row {
+    margin-top: 0.1rem;
+    padding-top: 0.24rem;
+  }
+
+  .app-header .header-search-box {
+    min-height: 40px;
+  }
+}
