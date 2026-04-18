@@ -2569,15 +2569,8 @@ button:hover {
 
 .seller-workspace {
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
-}
-
-.seller-sidebar {
-  position: sticky;
-  top: 16px;
-  align-self: start;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
 }
 
 .workflow-list {

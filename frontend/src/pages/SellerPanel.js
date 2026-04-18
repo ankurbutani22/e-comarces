@@ -521,69 +521,6 @@ function SellerPanel({ token, onProductAdded }) {
       </section>
 
       <div className="seller-workspace">
-        <nav className="seller-tabs" style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid #e5e7eb', marginBottom: '2rem', padding: '0 1rem' }}>
-          <button
-            type="button"
-            onClick={() => setTab('dashboard')}
-            style={{
-              padding: '0.75rem 1rem',
-              background: activeTab === 'dashboard' ? '#3b82f6' : 'transparent',
-              color: activeTab === 'dashboard' ? '#fff' : '#6b7280',
-              border: 'none',
-              borderBottom: activeTab === 'dashboard' ? '2px solid #3b82f6' : 'none',
-              cursor: 'pointer',
-              fontWeight: activeTab === 'dashboard' ? '600' : '400'
-            }}
-          >
-            Dashboard
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab('my-products')}
-            style={{
-              padding: '0.75rem 1rem',
-              background: activeTab === 'my-products' ? '#3b82f6' : 'transparent',
-              color: activeTab === 'my-products' ? '#fff' : '#6b7280',
-              border: 'none',
-              borderBottom: activeTab === 'my-products' ? '2px solid #3b82f6' : 'none',
-              cursor: 'pointer',
-              fontWeight: activeTab === 'my-products' ? '600' : '400'
-            }}
-          >
-            My Products
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab('add-products')}
-            style={{
-              padding: '0.75rem 1rem',
-              background: activeTab === 'add-products' ? '#3b82f6' : 'transparent',
-              color: activeTab === 'add-products' ? '#fff' : '#6b7280',
-              border: 'none',
-              borderBottom: activeTab === 'add-products' ? '2px solid #3b82f6' : 'none',
-              cursor: 'pointer',
-              fontWeight: activeTab === 'add-products' ? '600' : '400'
-            }}
-          >
-            Add Products
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab('all-orders')}
-            style={{
-              padding: '0.75rem 1rem',
-              background: activeTab === 'all-orders' ? '#3b82f6' : 'transparent',
-              color: activeTab === 'all-orders' ? '#fff' : '#6b7280',
-              border: 'none',
-              borderBottom: activeTab === 'all-orders' ? '2px solid #3b82f6' : 'none',
-              cursor: 'pointer',
-              fontWeight: activeTab === 'all-orders' ? '600' : '400'
-            }}
-          >
-            All Orders
-          </button>
-        </nav>
-
         {activeTab === 'dashboard' && (
           <main className="seller-main-column">
             <section className="panel-page">
