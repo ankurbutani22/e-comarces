@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { getDeliveryOrders, getMyOrders, getSellerOrders } from '../services/authService';
+import logo from '../utils/logo.svg';
 
 const PROFILE_PLACEHOLDER =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="32" fill="%23dbeafe"/><circle cx="32" cy="25" r="12" fill="%236b7280"/><path d="M14 52c3-9 9-14 18-14s15 5 18 14" fill="%236b7280"/></svg>';
@@ -86,13 +87,20 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
         { to: '/', label: 'Home' },
         { to: '/admin', label: 'Admin Panel' }
       ]
+    : user?.role === 'seller'
+    ? [
+        { to: '/seller', label: 'Seller Dashboard' },
+        { to: '/seller', label: 'My Products' },
+        { to: '/seller', label: 'Add Products' },
+        { to: '/seller', label: 'All Orders' },
+        { to: '/seller/scan', label: 'QR Scan' }
+      ]
     : [
         { to: '/', label: 'Home' },
         ...(canUseCart ? [{ to: '/cart', label: 'Cart' }] : []),
         ...(canSeeOrders ? [{ to: '/orders', label: 'My Orders' }] : []),
         ...(canUseScanner ? [{ to: '/seller/scan', label: 'QR Scanner' }] : []),
-        ...(canUseDeliveryPanel ? [{ to: '/delivery', label: 'Delivery Panel' }] : []),
-        ...(user?.role === 'seller' ? [{ to: '/seller', label: 'Seller Panel' }] : [])
+        ...(canUseDeliveryPanel ? [{ to: '/delivery', label: 'Delivery Panel' }] : [])
       ];
 
   return (
@@ -100,8 +108,7 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
       <div className="header-inner">
         <div className="header-top-row">
           <Link to="/" className="brand-link">
-            <span className="brand-mark">EC</span>
-            <span className="brand-text">E-Commerce Store</span>
+            <img src={logo} alt="Apna Bazaar Logo" className="brand-logo" style={{ height: '50px' }} />
           </Link>
 
           <div className="header-actions">
