@@ -5553,10 +5553,11 @@ select:focus,
 
   .app-header .header-nav,
   .app-header.mobile-menu-open .header-nav {
-    left: 8px;
-    right: 8px;
+    left: 50%;
+    right: auto;
     bottom: 6px;
     top: auto !important;
+    transform: translateX(-50%);
     padding: 0.38rem;
     border-radius: 14px;
   }
@@ -5587,5 +5588,63 @@ select:focus,
     display: grid !important;
     visibility: visible !important;
     opacity: 1 !important;
+  }
+}
+
+/* Header responsive cleanup overrides */
+@media (max-width: 768px) {
+  .header-inner {
+    padding: 0.68rem 0.78rem calc(0.52rem + env(safe-area-inset-bottom));
+    gap: 0.45rem;
+  }
+
+  .header-top-row {
+    gap: 0.6rem;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .brand-logo {
+    height: 38px;
+    max-width: 140px;
+  }
+
+  .header-actions {
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+  }
+
+  .header-actions .auth-link {
+    min-height: 34px;
+    padding: 0.4rem 0.62rem;
+    border-radius: 10px;
+    font-size: 0.74rem;
+    white-space: nowrap;
+  }
+
+  .header-search-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+  }
+
+  .header-search-box {
+    min-width: 0;
+    padding: 0.46rem 0.52rem 0.46rem 0.58rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand-logo {
+    height: 34px;
+    max-width: 124px;
+  }
+
+  .app-header.is-guest .header-actions .auth-link {
+    padding: 0.36rem 0.58rem;
+    font-size: 0.72rem;
+  }
+
+  .app-header.is-guest .header-actions .auth-link.primary {
+    display: none;
   }
 }
