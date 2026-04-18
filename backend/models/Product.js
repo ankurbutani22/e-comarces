@@ -116,7 +116,7 @@ const productSchema = new mongoose.Schema(
       default: []
     },
     customOptions: {
-      type: [String],
+      type: [mongoose.Schema.Types.Mixed],
       default: []
     }
   },

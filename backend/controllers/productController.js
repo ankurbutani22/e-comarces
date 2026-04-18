@@ -1,6 +1,43 @@
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 
+const toSafeNumber = (value, fallback = 0) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const normalizeCustomOptions = (rawOptions, fallbackPrice = 0, fallbackDiscountPercent = 0) => {
+  if (!Array.isArray(rawOptions)) {
+    return [];
+  }
+
+  const seenNames = new Set();
+
+  return rawOptions
+    .map((option) => {
+      const optionName = typeof option === 'string' ? option.trim() : String(option?.name || '').trim();
+      if (!optionName) {
+        return null;
+      }
+
+      const optionPrice = Math.max(0, toSafeNumber(option?.price, fallbackPrice));
+      const optionDiscount = Math.min(95, Math.max(0, toSafeNumber(option?.discountPercent, fallbackDiscountPercent)));
+
+      const dedupeKey = optionName.toLowerCase();
+      if (seenNames.has(dedupeKey)) {
+        return null;
+      }
+      seenNames.add(dedupeKey);
+
+      return {
+        name: optionName,
+        price: optionPrice,
+        discountPercent: optionDiscount
+      };
+    })
+    .filter(Boolean);
+};
+
 // Get products for logged in seller/admin
 exports.getMyProducts = async (req, res) => {
   try {
@@ -200,6 +237,11 @@ exports.createProduct = async (req, res) => {
       ...req.body,
       images: normalizedImages,
       image: fallbackImage,
+      customOptions: normalizeCustomOptions(
+        req.body.customOptions,
+        toSafeNumber(req.body.price, 0),
+        toSafeNumber(req.body.discountPercent, 0)
+      ),
       variants: cleanedVariants,
       seller: req.user._id
     };
@@ -253,6 +295,14 @@ exports.updateProduct = async (req, res) => {
       ...(normalizedImages ? { images: normalizedImages } : {}),
       ...(cleanedVariants ? { variants: cleanedVariants } : {})
     };
+
+    if (typeof req.body.customOptions !== 'undefined') {
+      updatePayload.customOptions = normalizeCustomOptions(
+        req.body.customOptions,
+        toSafeNumber(req.body.price, toSafeNumber(existingProduct.price, 0)),
+        toSafeNumber(req.body.discountPercent, toSafeNumber(existingProduct.discountPercent, 0))
+      );
+    }
 
     const candidateImage =
       updatePayload.image ||

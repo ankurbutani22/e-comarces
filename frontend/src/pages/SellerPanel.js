@@ -35,6 +35,8 @@ function SellerPanel({ token, onProductAdded }) {
   const [romSizeInput, setRomSizeInput] = useState('');
   const [customOptions, setCustomOptions] = useState([]);
   const [customOptionInput, setCustomOptionInput] = useState('');
+  const [customOptionPriceInput, setCustomOptionPriceInput] = useState('');
+  const [customOptionDiscountInput, setCustomOptionDiscountInput] = useState('');
   const [activeTab, setActiveTab] = useState(() => new URLSearchParams(location.search).get('tab') || 'dashboard');
   const [form, setForm] = useState({
     name: '',
@@ -208,22 +210,65 @@ function SellerPanel({ token, onProductAdded }) {
     setRomSizes(romSizes.filter(rom => rom !== romToRemove));
   };
 
+  const getCustomOptionName = (option) => (typeof option === 'string' ? option : String(option?.name || ''));
+
   const addCustomOption = () => {
     const normalizedValue = customOptionInput.trim();
-    if (normalizedValue && !customOptions.includes(normalizedValue)) {
-      setCustomOptions([...customOptions, normalizedValue]);
+    if (!normalizedValue) {
+      return;
+    }
+
+    const exists = customOptions.some(
+      (option) => getCustomOptionName(option).toLowerCase() === normalizedValue.toLowerCase()
+    );
+
+    if (!exists) {
+      const optionPrice = Math.max(0, Number(customOptionPriceInput || form.price || 0));
+      const optionDiscount = Math.min(95, Math.max(0, Number(customOptionDiscountInput || form.discountPercent || 0)));
+
+      setCustomOptions([
+        ...customOptions,
+        {
+          name: normalizedValue,
+          price: optionPrice,
+          discountPercent: optionDiscount
+        }
+      ]);
       setCustomOptionInput('');
+      setCustomOptionPriceInput('');
+      setCustomOptionDiscountInput('');
     }
   };
 
   const addCustomPreset = (option) => {
-    if (option && !customOptions.includes(option)) {
-      setCustomOptions([...customOptions, option]);
+    const optionName = String(option || '').trim();
+    if (!optionName) {
+      return;
+    }
+
+    const exists = customOptions.some(
+      (item) => getCustomOptionName(item).toLowerCase() === optionName.toLowerCase()
+    );
+
+    if (!exists) {
+      const optionPrice = Math.max(0, Number(form.price || 0));
+      const optionDiscount = Math.min(95, Math.max(0, Number(form.discountPercent || 0)));
+
+      setCustomOptions([
+        ...customOptions,
+        {
+          name: optionName,
+          price: optionPrice,
+          discountPercent: optionDiscount
+        }
+      ]);
     }
   };
 
   const removeCustomOption = (optionToRemove) => {
-    setCustomOptions(customOptions.filter(option => option !== optionToRemove));
+    setCustomOptions(
+      customOptions.filter((option) => getCustomOptionName(option) !== getCustomOptionName(optionToRemove))
+    );
   };
 
   const refreshProducts = async () => {
@@ -285,7 +330,13 @@ function SellerPanel({ token, onProductAdded }) {
         sizes: form.category === 'Clothing' ? sizes : undefined,
         ramSizes: form.category === 'Mobile' ? ramSizes : undefined,
         romSizes: form.category === 'Mobile' ? romSizes : undefined,
-        customOptions: customOptions.length > 0 ? customOptions : undefined
+        customOptions: customOptions.length > 0
+          ? customOptions.map((option) => ({
+              name: getCustomOptionName(option),
+              price: Math.max(0, Number(option?.price || form.price || 0)),
+              discountPercent: Math.min(95, Math.max(0, Number(option?.discountPercent || 0)))
+            }))
+          : undefined
       });
 
       await refreshProducts();
@@ -313,6 +364,8 @@ function SellerPanel({ token, onProductAdded }) {
       setRomSizeInput('');
       setCustomOptions([]);
       setCustomOptionInput('');
+      setCustomOptionPriceInput('');
+      setCustomOptionDiscountInput('');
       setVariantImageFiles({});
       resetMediaSelection();
     } catch (err) {
@@ -760,6 +813,23 @@ function SellerPanel({ token, onProductAdded }) {
                     onChange={(e) => setCustomOptionInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomOption())}
                   />
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="Option Price"
+                    value={customOptionPriceInput}
+                    onChange={(e) => setCustomOptionPriceInput(e.target.value)}
+                  />
+                  <input
+                    type="number"
+                    min="0"
+                    max="95"
+                    step="1"
+                    placeholder="Option Discount %"
+                    value={customOptionDiscountInput}
+                    onChange={(e) => setCustomOptionDiscountInput(e.target.value)}
+                  />
                   <button type="button" className="ghost-btn" onClick={addCustomOption}>
                     Add Option
                   </button>
@@ -772,7 +842,7 @@ function SellerPanel({ token, onProductAdded }) {
                       key={`${form.category}-${option}`}
                       className="ghost-btn"
                       onClick={() => addCustomPreset(option)}
-                      disabled={customOptions.includes(option)}
+                      disabled={customOptions.some((item) => getCustomOptionName(item) === option)}
                     >
                       + {option}
                     </button>
@@ -781,8 +851,10 @@ function SellerPanel({ token, onProductAdded }) {
 
                 <div className="size-chips">
                   {customOptions.map((option) => (
-                    <span key={option} className="size-chip">
-                      {option}
+                    <span key={getCustomOptionName(option)} className="size-chip">
+                      {getCustomOptionName(option)}
+                      {Number.isFinite(Number(option?.price)) ? ` | Rs. ${Number(option.price)}` : ''}
+                      {Number.isFinite(Number(option?.discountPercent)) ? ` | ${Number(option.discountPercent)}% off` : ''}
                       <button type="button" onClick={() => removeCustomOption(option)}>×</button>
                     </span>
                   ))}

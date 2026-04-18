@@ -24,6 +24,24 @@ const resolveMediaUrl = (value) => {
   return normalizedPath;
 };
 
+const normalizeCustomOption = (option, productPrice = 0, productDiscountPercent = 0) => {
+  const optionName = typeof option === 'string' ? option.trim() : String(option?.name || '').trim();
+  if (!optionName) {
+    return null;
+  }
+
+  const optionPrice = Number.isFinite(Number(option?.price)) ? Number(option.price) : Number(productPrice || 0);
+  const optionDiscount = Number.isFinite(Number(option?.discountPercent))
+    ? Number(option.discountPercent)
+    : Number(productDiscountPercent || 0);
+
+  return {
+    name: optionName,
+    price: Math.max(0, optionPrice),
+    discountPercent: Math.min(95, Math.max(0, optionDiscount))
+  };
+};
+
 function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -51,8 +69,27 @@ function ProductDetail() {
   const [hasOrderedProduct, setHasOrderedProduct] = useState(false);
   const [ratingValue, setRatingValue] = useState(0);
   const [ratingSaving, setRatingSaving] = useState(false);
-  const basePrice = Number(product?.price || 0);
-  const discountPercent = Math.min(95, Math.max(0, Number(product?.discountPercent || 0)));
+
+  const customOptions = useMemo(() => {
+    if (!Array.isArray(product?.customOptions)) {
+      return [];
+    }
+
+    return product.customOptions
+      .map((option) => normalizeCustomOption(option, product?.price, product?.discountPercent))
+      .filter(Boolean);
+  }, [product]);
+
+  const selectedCustomOptionData = useMemo(
+    () => customOptions.find((option) => option.name === selectedCustomOption) || null,
+    [customOptions, selectedCustomOption]
+  );
+
+  const basePrice = Number(selectedCustomOptionData?.price ?? product?.price ?? 0);
+  const discountPercent = Math.min(
+    95,
+    Math.max(0, Number(selectedCustomOptionData?.discountPercent ?? product?.discountPercent ?? 0))
+  );
   const discountedPrice = Math.max(0, Math.round(basePrice - (basePrice * discountPercent) / 100));
 
   const handleAddToCart = () => {
@@ -81,7 +118,7 @@ function ProductDetail() {
       return;
     }
 
-    if (Array.isArray(product.customOptions) && product.customOptions.length > 0 && !selectedCustomOption) {
+    if (customOptions.length > 0 && !selectedCustomOption) {
       toast.error('Please select custom option first.');
       return;
     }
@@ -148,7 +185,7 @@ function ProductDetail() {
       return false;
     }
 
-    if (Array.isArray(product.customOptions) && product.customOptions.length > 0 && !selectedCustomOption) {
+    if (customOptions.length > 0 && !selectedCustomOption) {
       toast.error('Please select custom option first.');
       return false;
     }
@@ -358,11 +395,6 @@ function ProductDetail() {
 
   const romSizeOptions = useMemo(
     () => (Array.isArray(product?.romSizes) ? product.romSizes : []),
-    [product]
-  );
-
-  const customOptions = useMemo(
-    () => (Array.isArray(product?.customOptions) ? product.customOptions : []),
     [product]
   );
 
@@ -609,12 +641,14 @@ function ProductDetail() {
               <div className="chip-row">
                 {customOptions.map((option) => (
                   <button
-                    key={option}
+                    key={option.name}
                     type="button"
-                    className={`option-chip ${selectedCustomOption === option ? 'active' : ''}`}
-                    onClick={() => setSelectedCustomOption(option)}
+                    className={`option-chip ${selectedCustomOption === option.name ? 'active' : ''}`}
+                    onClick={() => setSelectedCustomOption(option.name)}
                   >
-                    {option}
+                    {option.name}
+                    {Number.isFinite(Number(option.price)) ? ` | Rs. ${option.price}` : ''}
+                    {Number.isFinite(Number(option.discountPercent)) ? ` | ${option.discountPercent}% off` : ''}
                   </button>
                 ))}
               </div>
