@@ -33,6 +33,7 @@ function SellerPanel({ token, onProductAdded }) {
   const [romSizeInput, setRomSizeInput] = useState('');
   const [customOptions, setCustomOptions] = useState([]);
   const [customOptionInput, setCustomOptionInput] = useState('');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -580,14 +581,18 @@ function SellerPanel({ token, onProductAdded }) {
 
   if (!panelData) return <div className="seller-dashboard"><p className="loading">Please refresh to load seller panel.</p></div>;
 
+  const totalRevenue = sellerOrders.reduce((sum, order) => sum + (Number(order.sellerTotal) || 0), 0);
+  const completedOrders = sellerOrders.filter(o => o.status === 'completed' || o.status === 'delivered').length;
+  const pendingOrders = sellerOrders.filter(o => o.status === 'pending' || o.status === 'processing').length;
+
   return (
     <div className="seller-dashboard">
       <section className="seller-hero panel-page">
         <div className="seller-hero-copy-wrap">
           <p className="eyebrow">Seller Studio</p>
-          <h2>Add products with a clean SaaS workflow</h2>
+          <h2>Manage your store</h2>
           <p className="seller-hero-copy">
-            Create listings, upload media, and publish directly to the storefront.
+            View products, manage orders, and grow your business.
           </p>
         </div>
 
@@ -604,31 +609,147 @@ function SellerPanel({ token, onProductAdded }) {
             <span>Orders</span>
             <strong>{stats.orders}</strong>
           </div>
+          <div className="stat-pill">
+            <span>Revenue</span>
+            <strong>Rs. {totalRevenue}</strong>
+          </div>
         </div>
         {tableLoading ? <p className="loading">Refreshing seller data...</p> : null}
       </section>
 
       <div className="seller-workspace">
-        <aside className="seller-sidebar panel-page">
-          <p className="section-kicker">Workflow</p>
-          <h3>Publish in three steps</h3>
-          <ol className="workflow-list">
-            <li>
-              <strong>Detail</strong>
-              <span>Enter title, price, category, and stock.</span>
-            </li>
-            <li>
-              <strong>Media</strong>
-              <span>Upload image or video for rich product presentation.</span>
-            </li>
-            <li>
-              <strong>Publish</strong>
-              <span>Product appears on the user storefront instantly.</span>
-            </li>
-          </ol>
-        </aside>
+        <nav className="seller-tabs" style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid #e5e7eb', marginBottom: '2rem', padding: '0 1rem' }}>
+          <button
+            type="button"
+            onClick={() => setActiveTab('dashboard')}
+            style={{
+              padding: '0.75rem 1rem',
+              background: activeTab === 'dashboard' ? '#3b82f6' : 'transparent',
+              color: activeTab === 'dashboard' ? '#fff' : '#6b7280',
+              border: 'none',
+              borderBottom: activeTab === 'dashboard' ? '2px solid #3b82f6' : 'none',
+              cursor: 'pointer',
+              fontWeight: activeTab === 'dashboard' ? '600' : '400'
+            }}
+          >
+            Dashboard
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('my-products')}
+            style={{
+              padding: '0.75rem 1rem',
+              background: activeTab === 'my-products' ? '#3b82f6' : 'transparent',
+              color: activeTab === 'my-products' ? '#fff' : '#6b7280',
+              border: 'none',
+              borderBottom: activeTab === 'my-products' ? '2px solid #3b82f6' : 'none',
+              cursor: 'pointer',
+              fontWeight: activeTab === 'my-products' ? '600' : '400'
+            }}
+          >
+            My Products
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('add-products')}
+            style={{
+              padding: '0.75rem 1rem',
+              background: activeTab === 'add-products' ? '#3b82f6' : 'transparent',
+              color: activeTab === 'add-products' ? '#fff' : '#6b7280',
+              border: 'none',
+              borderBottom: activeTab === 'add-products' ? '2px solid #3b82f6' : 'none',
+              cursor: 'pointer',
+              fontWeight: activeTab === 'add-products' ? '600' : '400'
+            }}
+          >
+            Add Products
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('all-orders')}
+            style={{
+              padding: '0.75rem 1rem',
+              background: activeTab === 'all-orders' ? '#3b82f6' : 'transparent',
+              color: activeTab === 'all-orders' ? '#fff' : '#6b7280',
+              border: 'none',
+              borderBottom: activeTab === 'all-orders' ? '2px solid #3b82f6' : 'none',
+              cursor: 'pointer',
+              fontWeight: activeTab === 'all-orders' ? '600' : '400'
+            }}
+          >
+            All Orders
+          </button>
+        </nav>
 
-        <main className="seller-main-column">
+        {activeTab === 'dashboard' && (
+          <main className="seller-main-column">
+            <section className="panel-page">
+              <div className="section-head">
+                <p className="section-kicker">Overview</p>
+                <h3>Dashboard</h3>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
+                <div style={{ padding: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#f9fafb' }}>
+                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Total Products</p>
+                  <h4 style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937' }}>{stats.products}</h4>
+                </div>
+                <div style={{ padding: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#f9fafb' }}>
+                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Total Orders</p>
+                  <h4 style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937' }}>{stats.orders}</h4>
+                </div>
+                <div style={{ padding: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#f9fafb' }}>
+                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Completed</p>
+                  <h4 style={{ fontSize: '2rem', fontWeight: '700', color: '#10b981' }}>{completedOrders}</h4>
+                </div>
+                <div style={{ padding: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#f9fafb' }}>
+                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Pending</p>
+                  <h4 style={{ fontSize: '2rem', fontWeight: '700', color: '#f59e0b' }}>{pendingOrders}</h4>
+                </div>
+                <div style={{ padding: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#f9fafb' }}>
+                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>Total Revenue</p>
+                  <h4 style={{ fontSize: '2rem', fontWeight: '700', color: '#3b82f6' }}>Rs. {totalRevenue}</h4>
+                </div>
+              </div>
+            </section>
+          </main>
+        )}
+
+        {activeTab === 'my-products' && (
+          <main className="seller-main-column">
+            <section className="panel-page">
+              <div className="section-head">
+                <p className="section-kicker">Inventory</p>
+                <h3>My Products</h3>
+              </div>
+              {myProducts.length === 0 ? (
+                <p style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>No products added yet. <button type="button" onClick={() => setActiveTab('add-products')} style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', textDecoration: 'underline' }}>Create one now</button></p>
+              ) : (
+                <div className="seller-products-grid">
+                  {myProducts.map((product) => (
+                    <article className="seller-card" key={product._id}>
+                      <div className="section-head compact">
+                        <h4>{product.name}</h4>
+                      </div>
+                      {product.image ? <img src={product.image} alt={product.name} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '6px', marginBottom: '1rem' }} /> : null}
+                      <p><strong>Price:</strong> Rs. {product.price}</p>
+                      {product.discountPercent ? <p><strong>Discount:</strong> {product.discountPercent}%</p> : null}
+                      <p><strong>Stock:</strong> {product.stock}</p>
+                      <p><strong>Category:</strong> {product.category}</p>
+                      <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '0.5rem' }}>{product.description?.substring(0, 100)}...</p>
+                      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                        <button type="button" onClick={() => setActiveTab('add-products')} className="ghost-btn">Edit</button>
+                        <button type="button" onClick={() => deleteSellerProduct(token, product._id).then(() => refreshProducts()).catch(err => toast.error(err.response?.data?.message || 'Error deleting product'))} className="danger-btn">Delete</button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </section>
+          </main>
+        )}
+
+        {activeTab === 'add-products' && (
+          <main className="seller-main-column">
           <section className="panel-page seller-product-form">
             <form onSubmit={onSubmit} className="product-form-grid">
               <div className="field-span-2">
@@ -954,96 +1075,16 @@ function SellerPanel({ token, onProductAdded }) {
               </div>
             </form>
           </section>
+          </main>
+        )}
 
-          <section className="panel-page seller-list-wrap">
-            <div className="section-head">
-              <div>
-                <p className="section-kicker">Inventory</p>
-                <h3>My selling products</h3>
-              </div>
-              <span className="count-chip">{myProducts.length}</span>
-            </div>
-
-            {tableLoading ? <p className="loading">Loading products...</p> : null}
-            {!tableLoading && myProducts.length === 0 ? <p>No products yet. Add your first product.</p> : null}
-
-            {!tableLoading && myProducts.length > 0 ? (
-              <div className="seller-products-grid">
-                {myProducts.map((product) => {
-                  const basePrice = Number(product.price || 0);
-                  const discountPercent = Math.min(95, Math.max(0, Number(product.discountPercent || 0)));
-                  const discountedPrice = Math.max(0, Math.round(basePrice - (basePrice * discountPercent) / 100));
-
-                  return (
-                  <article className="seller-card" key={product._id}>
-                    <div className="seller-card-media">
-                      <img src={product.image} alt={product.name} />
-                      {product.video ? <span className="media-badge">Video</span> : null}
-                    </div>
-                    <h4>{product.name}</h4>
-                    <p>
-                      Price: Rs. {discountedPrice}
-                      {discountPercent > 0 ? ` (MRP Rs. ${basePrice}, ${discountPercent}% off)` : ''}
-                    </p>
-                    <p>Stock: {product.stock}</p>
-                    <p>Category: {product.category}</p>
-                    {product.variants && product.variants.length > 0 && (
-                      <div className="product-variants-badge">
-                        <span className="badge">Variants: {product.variants.length}</span>
-                      </div>
-                    )}
-                    {product.sizes && product.sizes.length > 0 && (
-                      <div className="product-sizes-badge">
-                        <span className="badge">Sizes: {product.sizes.join(', ')}</span>
-                      </div>
-                    )}
-                    {product.ramSizes && product.ramSizes.length > 0 && (
-                      <div className="product-sizes-badge">
-                        <span className="badge">RAM: {product.ramSizes.join(', ')}</span>
-                      </div>
-                    )}
-                    {product.romSizes && product.romSizes.length > 0 && (
-                      <div className="product-sizes-badge">
-                        <span className="badge">ROM: {product.romSizes.join(', ')}</span>
-                      </div>
-                    )}
-                    {product.customOptions && product.customOptions.length > 0 && (
-                      <div className="product-sizes-badge">
-                        <span className="badge">Custom: {product.customOptions.join(', ')}</span>
-                      </div>
-                    )}
-                    <div className="seller-actions">
-                      <button type="button" onClick={() => editProduct(product)} disabled={actionLoadingId === product._id}>
-                        Edit
-                      </button>
-                      <button type="button" onClick={() => changeStock(product, 1)} disabled={actionLoadingId === product._id}>
-                        + Stock
-                      </button>
-                      <button type="button" onClick={() => changeStock(product, -1)} disabled={actionLoadingId === product._id}>
-                        - Stock
-                      </button>
-                      <button type="button" onClick={() => markPrice(product, 'up')} disabled={actionLoadingId === product._id}>
-                        +5% Price
-                      </button>
-                      <button type="button" onClick={() => markPrice(product, 'down')} disabled={actionLoadingId === product._id}>
-                        -5% Price
-                      </button>
-                      <button type="button" className="danger-btn" onClick={() => removeProduct(product._id)} disabled={actionLoadingId === product._id}>
-                        Delete
-                      </button>
-                    </div>
-                  </article>
-                  );
-                })}
-              </div>
-            ) : null}
-          </section>
-
+        {activeTab === 'all-orders' && (
+          <main className="seller-main-column">
           <section className="panel-page seller-list-wrap">
             <div className="section-head">
               <div>
                 <p className="section-kicker">Orders</p>
-                <h3>Orders on my products</h3>
+                <h3>All orders on my products</h3>
               </div>
               <span className="count-chip">{sellerOrders.length}</span>
             </div>
@@ -1091,12 +1132,13 @@ function SellerPanel({ token, onProductAdded }) {
               </div>
             ) : null}
           </section>
-        </main>
+          </main>
+        )}
       </div>
 
       <section className="seller-footer-note panel-page">
         <p>
-          Inspired by modern SaaS product studio layouts, but built as an original interface for this app.
+          Manage your seller store efficiently with our streamlined dashboard.
         </p>
         <button type="button" onClick={() => window.location.assign('/seller/scan')} style={{ marginTop: '0.8rem' }}>
           Open QR Scanner
