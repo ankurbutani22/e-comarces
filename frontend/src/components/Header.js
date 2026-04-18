@@ -104,7 +104,7 @@ function Header({ user, token, onLogout, searchQuery, onSearchChange }) {
     setNotificationsOpen(false);
   };
 
-  const showSearch = location.pathname === '/';
+  const showSearch = false;
   const navItems = isAdmin
     ? [
         { to: '/admin?tab=home', label: 'Dashboard', tab: 'home', icon: 'dashboard' },

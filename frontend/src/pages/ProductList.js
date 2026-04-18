@@ -27,6 +27,7 @@ function ProductList({
   error,
   onRefresh,
   searchQuery = '',
+  onSearchChange,
   sortBy = 'featured',
   onSortChange,
   onClearFilters
@@ -110,6 +111,36 @@ function ProductList({
 
   return (
     <div className="storefront-shell">
+      <div className="storefront-search-shell">
+        <label className="storefront-search-label" htmlFor="storefront-search-input">Search products</label>
+        <div className="storefront-search-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true" className="storefront-search-icon">
+            <path
+              d="M10.5 4a6.5 6.5 0 104.11 11.53l4.43 4.43a1 1 0 001.41-1.42l-4.42-4.43A6.5 6.5 0 0010.5 4z"
+              fill="currentColor"
+            />
+          </svg>
+          <input
+            id="storefront-search-input"
+            type="search"
+            value={searchQuery}
+            onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+            placeholder="Search products"
+            className="storefront-search-input"
+          />
+          {searchQuery ? (
+            <button
+              type="button"
+              className="storefront-search-clear"
+              onClick={() => onSearchChange && onSearchChange('')}
+              aria-label="Clear search"
+            >
+              x
+            </button>
+          ) : null}
+        </div>
+      </div>
+
       {groupedSlides.length > 0 ? (
         <section className="home-ad-grid-carousel" aria-label="Featured ads showcase">
           <div className="home-ad-grid-track" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>

@@ -152,6 +152,7 @@ function App() {
                   error={error} 
                   onRefresh={fetchProducts}
                   searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
                   sortBy={sortBy}
                   onSortChange={setSortBy}
                   onClearFilters={() => {
