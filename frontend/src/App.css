@@ -4791,6 +4791,213 @@ select:focus,
   }
 }
 
+/* Final mobile premium pass */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 12px;
+  }
+
+  .storefront-shell,
+  .orders-shell,
+  .cart-shell,
+  .scanner-shell,
+  .profile-shell {
+    border-radius: 22px;
+    padding: 0.85rem;
+  }
+
+  .storefront-head,
+  .product-toolbar-head,
+  .section-head,
+  .page-head {
+    gap: 0.65rem;
+  }
+
+  .storefront-head {
+    padding: 0.65rem 0.5rem 0.2rem;
+  }
+
+  .storefront-head p,
+  .seller-hero-copy,
+  .admin-subtitle,
+  .delivery-subtitle,
+  .page-subtitle {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .product-toolbar-shell {
+    margin: 0.2rem 0.1rem 0.9rem;
+    padding: 0.85rem;
+    border-radius: 18px;
+  }
+
+  .product-toolbar {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+
+  .toolbar-sort-options {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+    scrollbar-width: thin;
+  }
+
+  .sort-pill-btn {
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+
+  .toolbar-reset-btn {
+    width: 100%;
+  }
+
+  .product-grid,
+  .admin-ads-gallery,
+  .delivery-grid,
+  .seller-products-grid,
+  .seller-metrics-grid,
+  .admin-feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .product-card,
+  .seller-card,
+  .delivery-card,
+  .order-card,
+  .cart-order-card,
+  .panel-page {
+    border-radius: 16px;
+  }
+
+  .product-image,
+  .seller-card-media {
+    height: 210px;
+  }
+
+  .checkout-summary-actions,
+  .action-row,
+  .seller-product-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+  }
+
+  .checkout-summary-actions button,
+  .action-row button,
+  .seller-product-actions button,
+  .seller-actions button,
+  .seller-card .danger-btn {
+    width: 100%;
+  }
+
+  .tracking-head,
+  .tracking-event-item,
+  .order-card-head,
+  .preview-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tracking-event-item span,
+  .preview-meta span {
+    white-space: normal;
+  }
+
+  .delivery-feature-strip {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.1rem;
+    scrollbar-width: thin;
+  }
+
+  .delivery-feature-chip {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .auth-wrapper {
+    min-height: auto;
+    align-items: stretch;
+    padding-top: 0.3rem;
+  }
+
+  .auth-shell {
+    border-radius: 18px;
+  }
+
+  .auth-side-panel {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+  }
+
+  .notification-panel {
+    left: 10px;
+    right: 10px;
+    top: 84px;
+    border-radius: 14px;
+  }
+
+  .notification-head,
+  .notification-item {
+    padding-inline: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 9px;
+  }
+
+  .page-title {
+    font-size: 1.24rem;
+  }
+
+  .storefront-head h2,
+  .detail-title,
+  .detail-price,
+  .product-toolbar-head h3,
+  .seller-hero-copy-wrap h2,
+  .admin-hero h2,
+  .delivery-hero h2 {
+    font-size: 1.16rem;
+  }
+
+  .header-inner {
+    border-radius: 20px;
+    padding: 0.72rem 0.62rem 0.76rem;
+  }
+
+  .panel-page,
+  .product-card,
+  .delivery-card,
+  .seller-card,
+  .order-card,
+  .cart-order-card,
+  .checkout-card,
+  .profile-card,
+  .buy-modal-card {
+    padding: 0.72rem;
+    border-radius: 14px;
+  }
+
+  .product-image,
+  .seller-card-media,
+  .preview-image-shell {
+    height: 190px;
+  }
+
+  .header-nav-link,
+  .auth-link,
+  .link-button.logout-btn,
+  .sort-pill-btn,
+  .admin-menu-btn,
+  button {
+    min-height: 42px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .app-toast,
   .app-toast .Toastify__close-button {
