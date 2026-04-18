@@ -34,7 +34,6 @@ function SellerPanel({ token, onProductAdded }) {
   const [customOptionPriceInput, setCustomOptionPriceInput] = useState('');
   const [customOptionDiscountInput, setCustomOptionDiscountInput] = useState('');
   const [activeTab, setActiveTab] = useState(() => new URLSearchParams(location.search).get('tab') || 'dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -86,21 +85,12 @@ function SellerPanel({ token, onProductAdded }) {
   useEffect(() => {
     const currentTab = new URLSearchParams(location.search).get('tab') || 'dashboard';
     setActiveTab(currentTab);
-    setSidebarOpen(false);
   }, [location.search]);
 
   const setTab = (nextTab) => {
     setActiveTab(nextTab);
     navigate(`/seller?tab=${nextTab}`);
-    setSidebarOpen(false);
   };
-
-  const menuItems = useMemo(() => ([
-    { key: 'dashboard', label: 'Dashboard', description: 'Overview and stats' },
-    { key: 'my-products', label: 'My Products', description: 'View and manage inventory' },
-    { key: 'add-products', label: 'Add Products', description: 'Create new listings' },
-    { key: 'all-orders', label: 'All Orders', description: 'Track seller orders' }
-  ]), []);
 
   const stats = useMemo(() => ({
     products: myProducts.length,
@@ -520,17 +510,6 @@ function SellerPanel({ token, onProductAdded }) {
           <p className="seller-hero-copy">
             View products, manage orders, and grow your business.
           </p>
-          <button
-            type="button"
-            className="seller-sidebar-toggle"
-            aria-label={sidebarOpen ? 'Close seller menu' : 'Open seller menu'}
-            aria-expanded={sidebarOpen}
-            onClick={() => setSidebarOpen((prev) => !prev)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
         </div>
 
         <div className="seller-hero-stats">
@@ -555,60 +534,7 @@ function SellerPanel({ token, onProductAdded }) {
       </section>
 
       <div className="seller-workspace">
-        <aside className={`seller-sidebar ${sidebarOpen ? 'open' : ''}`}>
-          <div className="seller-sidebar-head">
-            <div>
-              <p className="section-kicker">Navigation</p>
-              <h3>Seller Menu</h3>
-            </div>
-            <button
-              type="button"
-              className="seller-sidebar-close"
-              aria-label="Close seller menu"
-              onClick={() => setSidebarOpen(false)}
-            >
-              ×
-            </button>
-          </div>
-
-          <nav className="seller-sidebar-nav">
-            {menuItems.map((item) => (
-              <button
-                type="button"
-                key={item.key}
-                className={`seller-sidebar-link${activeTab === item.key ? ' active' : ''}`}
-                onClick={() => setTab(item.key)}
-              >
-                <span>{item.label}</span>
-                <small>{item.description}</small>
-              </button>
-            ))}
-
-            <button
-              type="button"
-              className="seller-sidebar-link"
-              onClick={() => {
-                setSidebarOpen(false);
-                navigate('/seller/scan');
-              }}
-            >
-              <span>QR Scanner</span>
-              <small>Scan order codes</small>
-            </button>
-          </nav>
-        </aside>
-
-        {sidebarOpen ? (
-          <button
-            type="button"
-            className="seller-sidebar-backdrop"
-            aria-label="Close seller menu backdrop"
-            onClick={() => setSidebarOpen(false)}
-          />
-        ) : null}
-
-        <div className="seller-content">
-          {activeTab === 'dashboard' && (
+        {activeTab === 'dashboard' && (
           <main className="seller-main-column">
             <section className="panel-page">
               <div className="section-head">
@@ -639,9 +565,9 @@ function SellerPanel({ token, onProductAdded }) {
               </div>
             </section>
           </main>
-          )}
+        )}
 
-          {activeTab === 'my-products' && (
+        {activeTab === 'my-products' && (
           <main className="seller-main-column">
             <section className="panel-page">
               <div className="section-head">
@@ -679,9 +605,9 @@ function SellerPanel({ token, onProductAdded }) {
               )}
             </section>
           </main>
-          )}
+        )}
 
-          {activeTab === 'add-products' && (
+        {activeTab === 'add-products' && (
           <main className="seller-main-column">
           <section className="panel-page seller-product-form">
             <form onSubmit={onSubmit} className="product-form-grid">
@@ -981,9 +907,9 @@ function SellerPanel({ token, onProductAdded }) {
             </form>
           </section>
           </main>
-          )}
+        )}
 
-          {activeTab === 'all-orders' && (
+        {activeTab === 'all-orders' && (
           <main className="seller-main-column">
           <section className="panel-page seller-list-wrap">
             <div className="section-head">
@@ -1038,8 +964,7 @@ function SellerPanel({ token, onProductAdded }) {
             ) : null}
           </section>
           </main>
-          )}
-        </div>
+        )}
       </div>
 
       <section className="seller-footer-note panel-page">
