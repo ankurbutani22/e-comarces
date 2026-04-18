@@ -124,19 +124,6 @@ function ProductList({
             ))}
           </div>
 
-          {groupedSlides.length > 1 ? (
-            <div className="home-carousel-dots">
-              {groupedSlides.map((_, index) => (
-                <button
-                  key={`dot-${index}`}
-                  type="button"
-                  className={`home-carousel-dot ${activeSlide === index ? 'active' : ''}`}
-                  onClick={() => setActiveSlide(index)}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          ) : null}
         </section>
       ) : null}
 
