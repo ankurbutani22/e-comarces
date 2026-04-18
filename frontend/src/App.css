@@ -5655,6 +5655,27 @@ select:focus,
     padding-bottom: calc(108px + env(safe-area-inset-bottom)) !important;
   }
 
+  .app-header .header-top-row {
+    display: grid !important;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    column-gap: 0.5rem;
+    row-gap: 0;
+    flex-wrap: nowrap !important;
+  }
+
+  .app-header .brand-link {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .app-header .header-actions {
+    grid-column: 3;
+    justify-self: end;
+    margin-left: 0 !important;
+    flex-wrap: nowrap !important;
+  }
+
   .app-header .header-nav,
   .app-header.mobile-menu-open .header-nav {
     position: fixed !important;
@@ -5686,6 +5707,11 @@ select:focus,
 @media (max-width: 420px) {
   .main-content {
     padding-bottom: calc(104px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .app-header .header-top-row {
+    grid-template-columns: minmax(96px, auto) 1fr auto;
+    column-gap: 0.35rem;
   }
 
   .app-header .header-nav,
