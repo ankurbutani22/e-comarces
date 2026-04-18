@@ -142,10 +142,40 @@ const normalizeTextValue = (value) => {
   return String(value).trim();
 };
 
+const normalizeCustomOption = (option, fallbackPrice = 0, fallbackDiscountPercent = 0) => {
+  const name = typeof option === 'string' ? option.trim() : normalizeTextValue(option?.name);
+  if (!name) {
+    return null;
+  }
+
+  const basePrice = Number.isFinite(Number(option?.price)) ? Number(option.price) : Number(fallbackPrice || 0);
+  const discountPercent = Number.isFinite(Number(option?.discountPercent))
+    ? Number(option.discountPercent)
+    : Number(fallbackDiscountPercent || 0);
+
+  return {
+    name,
+    price: Math.max(0, basePrice),
+    discountPercent: Math.min(95, Math.max(0, discountPercent))
+  };
+};
+
 const getDiscountedUnitPrice = (product) => {
   const basePrice = Number(product?.price || 0);
   const discountPercent = Math.min(95, Math.max(0, Number(product?.discountPercent || 0)));
   return Math.max(0, Math.round(basePrice - (basePrice * discountPercent) / 100));
+};
+
+const getDiscountedCustomOptionPrice = (customOption, product) => {
+  const normalized = normalizeCustomOption(customOption, product?.price, product?.discountPercent);
+  if (!normalized) {
+    return getDiscountedUnitPrice(product);
+  }
+
+  return Math.max(
+    0,
+    Math.round(normalized.price - (normalized.price * normalized.discountPercent) / 100)
+  );
 };
 
 exports.createOrder = async (req, res) => {
@@ -267,17 +297,26 @@ exports.createOrder = async (req, res) => {
         });
       }
 
-      const availableCustomOptions = Array.isArray(matched.customOptions) ? matched.customOptions : [];
+      const availableCustomOptions = Array.isArray(matched.customOptions)
+        ? matched.customOptions
+            .map((option) => normalizeCustomOption(option, matched.price, matched.discountPercent))
+            .filter(Boolean)
+        : [];
       if (availableCustomOptions.length > 0 && !selectedCustomOption) {
         return res.status(400).json({
           success: false,
           message: `Please select customization option for ${matched.name}`
         });
       }
+
+      const matchedCustomOption = availableCustomOptions.find(
+        (option) => option.name.toLowerCase() === selectedCustomOption.toLowerCase()
+      );
+
       if (
         selectedCustomOption &&
         availableCustomOptions.length > 0 &&
-        !availableCustomOptions.includes(selectedCustomOption)
+        !matchedCustomOption
       ) {
         return res.status(400).json({
           success: false,
@@ -307,7 +346,9 @@ exports.createOrder = async (req, res) => {
         }
       }
 
-      const linePrice = getDiscountedUnitPrice(matched);
+      const linePrice = matchedCustomOption
+        ? getDiscountedCustomOptionPrice(matchedCustomOption, matched)
+        : getDiscountedUnitPrice(matched);
       totalAmount += linePrice * quantity;
 
       const selectedVariantImage =
