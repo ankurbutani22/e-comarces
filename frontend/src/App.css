@@ -2813,8 +2813,126 @@ button:hover {
 
 .seller-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: 280px minmax(0, 1fr);
   gap: 1rem;
+  align-items: start;
+}
+
+.seller-content {
+  min-width: 0;
+}
+
+.seller-sidebar {
+  position: sticky;
+  top: 100px;
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border-radius: 22px;
+  border: 1px solid #c9d8e4;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%);
+  box-shadow: 0 18px 38px rgba(28, 54, 76, 0.12);
+}
+
+.seller-sidebar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.seller-sidebar-head h3 {
+  margin-top: 0.15rem;
+}
+
+.seller-sidebar-toggle,
+.seller-sidebar-close {
+  border: none;
+  background: linear-gradient(135deg, #2f6f88 0%, #25596d 100%);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(18, 42, 64, 0.16);
+}
+
+.seller-sidebar-toggle {
+  display: none;
+  margin-top: 0.9rem;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 14px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-direction: column;
+}
+
+.seller-sidebar-toggle span {
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: #fff;
+  display: block;
+}
+
+.seller-sidebar-close {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 12px;
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.seller-sidebar-nav {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.seller-sidebar-link {
+  text-align: left;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  border: 1px solid #d7e3ed;
+  background: #fff;
+  color: #17384d;
+  display: grid;
+  gap: 0.2rem;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 6px 16px rgba(18, 42, 64, 0.06);
+}
+
+.seller-sidebar-link span {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.seller-sidebar-link small {
+  color: #607489;
+  font-size: 0.8rem;
+}
+
+.seller-sidebar-link:hover {
+  transform: translateX(4px);
+  border-color: #9fc1d4;
+  background: linear-gradient(135deg, #f5fbff 0%, #edf6fb 100%);
+  box-shadow: 0 10px 22px rgba(18, 42, 64, 0.1);
+}
+
+.seller-sidebar-link.active {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  color: #fff;
+  border-color: #1d4ed8;
+  box-shadow: 0 14px 28px rgba(29, 78, 216, 0.22);
+}
+
+.seller-sidebar-link.active small {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.seller-sidebar-backdrop {
+  display: none;
 }
 
 .workflow-list {
@@ -3480,11 +3598,11 @@ select,
 
 @media (max-width: 1100px) {
   .seller-workspace {
-    grid-template-columns: 1fr;
+    grid-template-columns: 240px minmax(0, 1fr);
   }
 
   .seller-sidebar {
-    position: static;
+    top: 92px;
   }
 }
 
@@ -3516,6 +3634,45 @@ select,
     padding: 14px;
   }
 
+  .seller-sidebar-toggle {
+    display: inline-flex;
+  }
+
+  .seller-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .seller-sidebar {
+    position: fixed;
+    left: 14px;
+    top: 78px;
+    bottom: 14px;
+    width: min(320px, calc(100vw - 28px));
+    transform: translateX(-120%);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 310;
+    overflow-y: auto;
+  }
+
+  .seller-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .seller-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    border: none;
+    background: rgba(15, 23, 42, 0.35);
+    backdrop-filter: blur(2px);
+    padding: 0;
+  }
+
+  .seller-sidebar-link:hover {
+    transform: translateX(0);
+  }
+
   .header-inner {
     background: linear-gradient(135deg, rgba(22, 53, 72, 0.98) 0%, rgba(34, 84, 108, 0.98) 56%, rgba(43, 121, 112, 0.98) 100%);
     border: 1px solid rgba(205, 227, 244, 0.16);
@@ -3532,6 +3689,19 @@ select,
 
   .header-bottom-row {
     padding-top: 0.2rem;
+  }
+
+  .seller-hero {
+    position: relative;
+  }
+
+  .seller-hero-copy-wrap {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .seller-sidebar-toggle {
+    justify-self: start;
   }
 
   .delivery-stats-grid {
