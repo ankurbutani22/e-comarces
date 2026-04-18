@@ -3759,6 +3759,26 @@ select,
     width: 100%;
   }
 
+  .notification-wrap {
+    width: 100%;
+  }
+
+  .notification-panel {
+    position: fixed;
+    top: 78px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-width: none;
+    max-height: calc(100vh - 96px);
+    overflow: hidden;
+    z-index: 220;
+  }
+
+  .notification-list {
+    max-height: calc(100vh - 180px);
+  }
+
   .header-nav {
     width: 100%;
     justify-content: stretch;
